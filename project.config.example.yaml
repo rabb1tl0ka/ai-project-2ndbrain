@@ -1,0 +1,31 @@
+# Project Brain Setup Configuration
+# Copy this file to project.config.yaml, fill in your details, then run: ./setup.sh
+#
+# Rules:
+#   - Keep values in double quotes
+#   - No colons (:) inside values
+#   - ENGAGEMENT_CONTEXT can be 1-2 sentences
+
+# The client or product name (e.g. "ZenQMS", "CloudSort")
+PROJECT_NAME: "Your Client"
+
+# Full legal or formal client name if different (e.g. "ZenQMS Inc.")
+CLIENT_NAME: "Your Client Inc."
+
+# What type of engagement this is (e.g. "GenAI Assessment", "Staff Augmentation", "POC")
+ENGAGEMENT_TYPE: "Your Engagement Type"
+
+# 1-2 sentences describing what Loka is doing for this client
+ENGAGEMENT_CONTEXT: "Describe what Loka is building or delivering for this client."
+
+# Your full name
+OWNER_NAME: "Your Name"
+
+# Your @handle used in notes and attributions
+OWNER_HANDLE: "@yourhandle"
+
+# Your role on this engagement (e.g. "TPM", "ML Lead", "Tech Lead")
+OWNER_ROLE: "Your Role"
+
+# Name of the first SOW directory to create (e.g. "sow1", "sow4", "phase1")
+FIRST_SOW: "sow1"
