@@ -1,20 +1,23 @@
 Process Gemini meeting notes from Google Drive into structured meeting summaries for this project.
 
-## Guard: check for un-replaced placeholders
+## Pre-flight
 
-Before doing anything else, check whether the configuration values below still contain `{{` and `}}`.
+1. Read `../project.config.yaml` (one level up from the vault). Extract `PROJECT_NAME`. If the file doesn't exist or `PROJECT_NAME` is still the literal `{{PROJECT_NAME}}`, stop:
+   > "Onboarding hasn't been run yet. Run `/onboard` from the repo root first, then try again."
 
-If either `{{GEMINI_NOTES_FOLDER}}` or `{{PROJECT_NAME}}` appears verbatim in this file (i.e. setup hasn't run yet), stop immediately and tell the user:
+2. Determine which SOW to recap meetings for:
+   - Scan `sows/` for subdirectories excluding `_template`.
+   - If only one SOW exists, use it.
+   - If multiple SOWs exist, ask: "Which SOW are you recapping meetings for? [list options]"
 
-> "This command isn't configured yet. Run `/onboard` from the repo root first, then try again."
-
-Do not proceed past this point if placeholders are detected.
+3. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDER`. If it's empty, ask:
+   > "No Drive folder configured for [sow]. Paste the Google Drive folder URL for the meeting notes."
 
 ## Configuration
 
-- **Drive folder**: {{GEMINI_NOTES_FOLDER}}
-- **Project filter**: {{PROJECT_NAME}}
-- **State file**: `.meeting-recap-state.md` (in the vault root)
+- **Project filter**: PROJECT_NAME (read from `../project.config.yaml`)
+- **Drive folder**: DRIVE_FOLDER (read from `sows/<sow>/sow.config.yaml`)
+- **State file**: `.meeting-recap-state.md` (vault root)
 - **Summary template**: `templates/meeting-summary.md`
 
 ## Gemini filename convention
@@ -31,9 +34,9 @@ Example: `CS GCP Cost Optimization - 2026/05/28 14:22 WEST - Notes by Gemini`
 
 1. Read `.meeting-recap-state.md` for `last_ran`. If missing or empty, default to 7 days ago.
 2. Extract the Drive folder ID from the configured URL (last path segment after `/folders/`).
-3. Search the folder for files whose names contain "{{PROJECT_NAME}}" and were modified after `last_ran`.
+3. Search the folder for files whose names contain PROJECT_NAME and were modified after `last_ran`.
 4. Process each match (see **Processing** below).
-5. Report: "Processed N meetings. Found M other meetings in that period that didn't match '{{PROJECT_NAME}}' — use `--keywords` to check them."
+5. Report: "Processed N meetings. Found M other meetings in that period that didn't match PROJECT_NAME — use `--keywords` to check them."
 6. Update `last_ran` in `.meeting-recap-state.md` to today's date.
 
 ### Keywords — `/meeting-recap --keywords {words}`
@@ -72,8 +75,8 @@ For each file:
 3. If `--details` is passed alongside any mode, also append the "Details" section content to Notes (timestamped bullets, verbatim).
 
 4. Identify the SOW:
-   - Infer from context if obvious (e.g. meeting title matches a known SOW topic)
-   - Ask the user if ambiguous
+   - Use the SOW identified in pre-flight if unambiguous.
+   - Ask if the meeting context suggests a different SOW.
 
 5. Build the slug from the meeting title: lowercase, kebab-case (e.g. `cs-gcp-cost-optimization`).
 
