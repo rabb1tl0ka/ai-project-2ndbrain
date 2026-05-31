@@ -6,7 +6,7 @@ Before doing anything else, check whether the configuration values below still c
 
 If either `{{GEMINI_NOTES_FOLDER}}` or `{{PROJECT_NAME}}` appears verbatim in this file (i.e. setup hasn't run yet), stop immediately and tell the user:
 
-> "This command isn't configured yet. Run `./setup.sh` from the repo root first, then try again."
+> "This command isn't configured yet. Run `/onboard` from the repo root first, then try again."
 
 Do not proceed past this point if placeholders are detected.
 

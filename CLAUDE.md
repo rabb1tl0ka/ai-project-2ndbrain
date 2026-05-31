@@ -11,9 +11,9 @@ A ready-to-use project knowledge system. Clone it, fill in a config file, run se
 | File | Purpose |
 |------|---------|
 | `README.md` | Full setup instructions — read this first |
-| `project.config.example.yaml` | Config template — copy to `project.config.yaml` and fill in |
+| `project.config.example.yaml` | Config reference |
 | `project.config.yaml` | Your project config — gitignored, never committed |
-| `setup.sh` | Replaces `{{placeholders}}` in the vault and creates your first SOW |
+| `.claude/commands/onboard.md` | `/onboard` — guided setup, run from the repo root |
 | `project-vault/` | The actual project brain — open in Obsidian or any markdown editor |
 
 ## How to help a new user
@@ -22,17 +22,16 @@ When someone says "help me get started" or "read the README":
 
 1. Read `README.md` in full
 2. Walk them through setup conversationally
-3. Tell them to run `./setup.sh` first — it auto-creates `project.config.yaml` on first run and exits
-4. Help them fill in each field if they're unsure
-5. Once config looks good, tell them to run `./setup.sh` again to apply it
-6. Point them to `project-vault/CLAUDE.md` to understand how to work inside the brain
+3. Tell them to run `/onboard` — it asks each config field, writes `project.config.yaml`, replaces placeholders, and creates the first SOW
+4. Once onboarding is done, tell them to `cd project-vault && claude` and run `/bootstrap`
+5. Point them to `project-vault/CLAUDE.md` to understand how to work inside the brain
 
 ## Common questions
 
 - **"What is this?"** — A project knowledge system built around how Loka engagements actually run: SOWs, working sessions, stakeholders, TLUs, and a roadmap. Claude understands the structure.
 - **"Do I need Obsidian?"** — No. Any markdown editor works. Obsidian is recommended.
 - **"I'm not a TPM — is this for me?"** — Yes. The structure instills TPM habits (stakeholder tracking, SOW organization, status updates) without requiring TPM experience. Fill in what you know, Claude handles the rest.
-- **"After setup, what do I do?"** — Open `project-vault/` in your editor, spawn Claude Code inside it, then fill in `project-vault/CLAUDE.md` with your team and client details.
+- **"After onboarding, what do I do?"** — Run `/bootstrap` from inside `project-vault/`. It loads the SOW, meeting notes, and Slack history into the vault.
 - **"What's `.kernel/`?"** — Internal repo tooling for the maintainer. Ignore it.
 
 ## What you should NOT do

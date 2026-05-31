@@ -4,6 +4,8 @@
 
 Run `git pull` before starting any session to make sure you're on the latest version.
 
+If this is the very first session and the vault hasn't been loaded yet, run `/bootstrap` — it pulls the SOW, meeting notes, and Slack history into the vault so Claude has real project context from the start.
+
 ## Who are you?
 
 At the start of each session, check whether the user has identified themselves (name and role). Look for this in their global `~/.claude/CLAUDE.md` or anything they've said in the current conversation.
@@ -133,11 +135,12 @@ When logging a meeting or interaction, look up who was in the room and let their
 ## Meeting Summaries
 
 **Gemini notes folder**: {{GEMINI_NOTES_FOLDER}}
+**Slack channels**: {{SLACK_CHANNELS}}
 
 Meeting notes for this project live in Google Drive as Gemini notes. Filenames follow this convention:
 `{meeting title} - {YYYY/MM/DD HH:MM TZ} - Notes by Gemini`
 
-Use the `/meeting-recap` command to process them. It searches the configured Drive folder, filters by project name, and saves structured summaries into the right SOW.
+Use `/bootstrap` once to load all historical meetings into the vault. After that, use `/meeting-recap` for new meetings as they happen — it picks up only what's changed since the last run.
 
 To manually log a meeting (e.g. from a paste or a file you already have open):
 1. Identify the SOW

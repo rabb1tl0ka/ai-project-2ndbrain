@@ -17,73 +17,60 @@ project-vault/         ← your project brain (open this in Obsidian)
   notes/               ← project-level thinking and context
   archive/             ← processed inbox items worth keeping
   templates/           ← working session, meeting summary, TLU templates
-project.config.example.yaml  ← config template
+project.config.example.yaml  ← config reference
 project.config.yaml          ← your project config, gitignored — never committed
-setup.sh                     ← applies your config and creates your first SOW
 ```
 
 ## Setup
 
-**1. Clone**
+**1. Fork and clone**
+
+Fork this repo on GitHub (one fork per project engagement), then clone your fork:
 ```bash
-git clone https://github.com/rabb1tl0ka/ai-project-2ndbrain
-cd ai-project-2ndbrain
+git clone https://github.com/<your-org>/<your-project>-ai-2ndbrain
+cd <your-project>-ai-2ndbrain
 ```
 
-**2. Fill in your config**
+**2. Run /onboard**
 
-Run setup once to generate your config file:
+Start Claude Code from the repo root:
 ```bash
-./setup.sh
+claude
 ```
 
-On first run, it creates `project.config.yaml` and exits. Fill in your details — 8 fields, takes 2 minutes:
-
-```yaml
-PROJECT_NAME: "Acme Corp"
-CLIENT_NAME: "Acme Corp Inc."
-ENGAGEMENT_TYPE: "GenAI Assessment"
-ENGAGEMENT_CONTEXT: "Loka is assessing Acme Corp's AI infrastructure and producing a modernization roadmap."
-OWNER_NAME: "Your Name"
-OWNER_HANDLE: "@yourhandle"
-OWNER_ROLE: "TPM"
-FIRST_SOW: "sow1"
+Then run:
 ```
+/onboard
+```
+
+Claude will ask you for each config value, write `project.config.yaml`, replace all `{{placeholders}}` in the vault, and create your first SOW directory. Takes about 2 minutes.
 
 `project.config.yaml` is gitignored — your config is never committed.
 
-**3. Run setup again**
-```bash
-./setup.sh
-```
-
-Replaces all `{{placeholders}}` in the vault with your values and creates your first SOW directory.
-
-**4. Push to your project's GitHub**
+**3. Commit and push**
 
 ```bash
-git remote set-url origin <your-new-repo-url>
 git add -A && git commit -m "init: configure project brain"
-git push -u origin main
+git push
 ```
 
-Create a fresh repo for this project — don't push back to this template.
+**4. Enter the vault and bootstrap**
 
-**5. Open the vault and spawn Claude Code**
-
-Open `project-vault/` in Obsidian (or any markdown editor).
-
-Then start a Claude Code session inside it:
 ```bash
 cd project-vault
 claude
 ```
 
-Claude reads `CLAUDE.md` automatically and knows how the brain works.
+Then run:
+```
+/bootstrap
+```
 
-**6. Fill in your context**
+This pulls in the SOW document, all historical meeting notes from Google Drive, and recent Slack history — then generates a context snapshot, stakeholder stubs, and a tensions/gaps report between what the SOW commits to and what's actually happening in the project.
 
-Open `project-vault/CLAUDE.md` and complete the team and stakeholder sections. This is what makes the brain smart about your specific engagement.
+**5. Fill in any gaps**
+
+Open `notes/project-context.md` — that's your ground truth. Fill in team profiles in `team/`, enrich stakeholder profiles in `stakeholders/`, and address any tensions flagged by bootstrap.
 
 ## How to use it
 
@@ -116,4 +103,4 @@ To start a new SOW: copy `sows/_template/` and rename it.
 
 - [Claude Code](https://claude.ai/code) — for AI-assisted project work
 - A markdown editor — [Obsidian](https://obsidian.md) recommended (any editor works)
-- `bash` + `sed` — for `setup.sh` (standard on macOS and Linux)
+- Google Drive and Slack connected in Claude Code (for `/bootstrap`)

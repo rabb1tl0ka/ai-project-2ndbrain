@@ -33,3 +33,16 @@ FIRST_SOW: "sow1"
 # Google Drive folder URL containing your Gemini meeting notes
 # Find it by opening the folder in Drive and copying the URL
 GEMINI_NOTES_FOLDER: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID"
+
+# (Optional) Direct URL to the SOW / Scope of Work / Implementation Proposal doc in Google Drive
+# If empty, /bootstrap will search your Drive folder for files with "SOW", "Scope of Work", or "Implementation Proposal" in the name
+SOW_DOC_URL: ""
+
+# Slack channel(s) for this project — comma-separated, include the # prefix
+# Example: "#zenqms-general, #zenqms-tech"
+SLACK_CHANNELS: "#your-project-channel"
+
+# (Optional) Comma-separated Gemini note doc URLs
+# Use when your meeting notes live in multiple Drive folders, or you want to point to specific docs directly
+# Example: "https://docs.google.com/document/d/ID1, https://docs.google.com/document/d/ID2"
+GEMINI_NOTES_DOCS: ""
