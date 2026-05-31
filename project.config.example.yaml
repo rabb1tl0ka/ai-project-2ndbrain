@@ -29,3 +29,7 @@ OWNER_ROLE: "Your Role"
 
 # Name of the first SOW directory to create (e.g. "sow1", "sow4", "phase1")
 FIRST_SOW: "sow1"
+
+# Google Drive folder URL containing your Gemini meeting notes
+# Find it by opening the folder in Drive and copying the URL
+GEMINI_NOTES_FOLDER: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID"

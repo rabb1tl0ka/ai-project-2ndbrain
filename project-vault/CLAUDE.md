@@ -132,7 +132,14 @@ When logging a meeting or interaction, look up who was in the room and let their
 
 ## Meeting Summaries
 
-When the user says "log this meeting" or "save this meeting summary":
+**Gemini notes folder**: {{GEMINI_NOTES_FOLDER}}
+
+Meeting notes for this project live in Google Drive as Gemini notes. Filenames follow this convention:
+`{meeting title} - {YYYY/MM/DD HH:MM TZ} - Notes by Gemini`
+
+Use the `/meeting-recap` command to process them. It searches the configured Drive folder, filters by project name, and saves structured summaries into the right SOW.
+
+To manually log a meeting (e.g. from a paste or a file you already have open):
 1. Identify the SOW
 2. Use `templates/meeting-summary.md`
 3. Save to `sows/<sow-name>/meeting-summaries/YYYY-MM-DD-<slug>.md`
