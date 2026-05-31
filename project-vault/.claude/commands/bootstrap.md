@@ -1,21 +1,64 @@
 Bootstrap this project brain from real project data: SOW documents, meeting notes, and Slack history.
 
-Run once after `/onboard` — it loads every configured SOW so Claude understands the full engagement from day one.
+## Modes
+
+### `/bootstrap`
+Process all SOW directories that have a `sow.config.yaml`. Run once after `/onboard` to load the full engagement history.
+
+### `/bootstrap --sow <name>`
+Target a single SOW by name (e.g. `/bootstrap --sow sow3`).
+- If the SOW directory already exists: reprocess it only (skip all other SOWs).
+- If the SOW directory does NOT exist: create it, collect its config interactively, then process it.
+
+Use this to add a new SOW to an already-bootstrapped brain, or to refresh a single SOW without reprocessing everything.
 
 ---
 
 ## Pre-flight
 
-1. Read `project.config.yaml` from the repo root (one level up: `../project.config.yaml`). Extract `PROJECT_NAME`. If it's still the literal string `{{PROJECT_NAME}}` or the file doesn't exist, stop:
+1. Read `../project.config.yaml`. Extract `PROJECT_NAME`. If it's still the literal string `{{PROJECT_NAME}}` or the file doesn't exist, stop:
    > "Onboarding hasn't been run yet. Run `/onboard` from the repo root first, then come back."
 
-2. Discover all SOW directories: scan `sows/` for subdirectories that are NOT `_template`. These are the SOWs to process.
-   If none are found (only `_template` exists), stop:
-   > "No SOWs found. Run `/onboard` to set them up first."
+2. **If `--sow <name>` was passed:**
+   - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
+   - If `sows/<name>/` exists: skip to **For each SOW**, processing only `<name>`.
 
-3. Read `.bootstrap-state.md`. If `last_ran` has a date, warn:
+3. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
+   If none found, stop:
+   > "No SOWs found. Run `/onboard` to set them up first, or run `/bootstrap --sow <name>` to add one now."
+   Read `.bootstrap-state.md`. If `last_ran` has a date, warn:
    > "Bootstrap was already run on [date]. Re-running will reprocess all SOWs. Continue? [y/N]"
    Stop if declined.
+
+---
+
+## New SOW setup (only when `--sow <name>` targets a non-existent SOW)
+
+1. Create the SOW directory from the template:
+   ```bash
+   cp -r sows/_template sows/<name>
+   mv sows/<name>/sow-reference.md sows/<name>/<name>-reference.md
+   ```
+
+2. Ask for per-SOW config (press enter to skip optional fields):
+
+   - **DRIVE_FOLDER** — "Google Drive folder URL for <name> meeting notes. Paste the URL. (Press enter to skip and fill in later.)"
+   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDER automatically.)"
+   - **SLACK_CHANNELS** — "Slack channel(s) for <name>, comma-separated with # prefix. (Press enter to skip.)"
+   - **GEMINI_NOTES_DOCS** — "Specific Gemini note doc URLs for <name>, comma-separated. Only needed if notes aren't all in one folder. (Press enter to skip.)"
+
+3. Write `sows/<name>/sow.config.yaml`:
+   ```yaml
+   # SOW Configuration — <name>
+   # Created by /bootstrap --sow <name>
+
+   DRIVE_FOLDER: "<value or empty>"
+   SOW_DOC_URL: "<value or empty>"
+   SLACK_CHANNELS: "<value or empty>"
+   GEMINI_NOTES_DOCS: "<value or empty>"
+   ```
+
+4. Confirm: "Created sows/<name>/. Now bootstrapping it..."
 
 ---
 
