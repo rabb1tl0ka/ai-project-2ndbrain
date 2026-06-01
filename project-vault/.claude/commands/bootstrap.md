@@ -21,7 +21,9 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 2. **If `--sow <name>` was passed:**
    - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
-   - If `sows/<name>/` exists: skip to **For each SOW**, processing only `<name>`.
+   - If `sows/<name>/` exists: check whether it has already been bootstrapped by counting `.md` files in `sows/<name>/meeting-summaries/` and checking if `sows/<name>/slack-context.md` exists. If either has content, warn:
+     > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
+     Stop if declined. Otherwise continue to **For each SOW**, processing only `<name>`.
 
 3. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
    If none found, stop:
