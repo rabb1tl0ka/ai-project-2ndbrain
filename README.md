@@ -92,6 +92,29 @@ From the repo root, run `/2ndbrain` — it reads your current state and tells yo
 
 **Track an idea or challenge** → ask Claude: *"save this as an idea"* — goes to `roadmap/`
 
+**Publish to Notion** → run `/publish-to-notion <file>` from inside the vault — pushes any `.md` file as a child page of the SOW's Notion project page (idempotent: republishing updates the existing page)
+
+**Pull from Notion** → run `/fetch-from-notion [sow-name]` — reads child pages and follows the TLU Previous Update chain, writing everything to `sows/<sow>/notion-context.md`
+
+## Notion channel
+
+Each SOW can be connected to a Notion project page. Add the URL to `sows/<sow>/sow.config.yaml`:
+
+```yaml
+NOTION_PROJECT_URL: "https://app.notion.com/..."
+```
+
+Once set, two commands become available inside the vault:
+
+| Command | What it does |
+|---------|-------------|
+| `/publish-to-notion <file>` | Publishes a vault `.md` file to Notion as a child page. Updates the page if it already exists (matched by title). |
+| `/fetch-from-notion [sow]` | Pulls all child pages from the Notion project page, traverses TLU history chains, and writes `notion-context.md`. |
+
+`/bootstrap` also reads from Notion automatically when `NOTION_PROJECT_URL` is set — it prompts for the URL if it's missing.
+
+**Requires:** Notion connector enabled in Claude settings (claude.ai → Integrations → Notion).
+
 ## SOW structure
 
 Each SOW lives at `sows/<sow-name>/`:
@@ -110,3 +133,4 @@ To start a new SOW: copy `sows/_template/` and rename it.
 - [Claude Code](https://claude.ai/code) — for AI-assisted project work
 - A markdown editor — [Obsidian](https://obsidian.md) recommended (any editor works)
 - Google Drive and Slack connected in Claude Code (for `/bootstrap`)
+- Notion connected in Claude Code (optional — for `/publish-to-notion` and `/fetch-from-notion`)
