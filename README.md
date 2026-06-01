@@ -1,6 +1,6 @@
 # AI Project 2nd Brain
 
-A Claude-powered project knowledge system for Loka engagements. Clone it, configure it in 2 minutes, and have a working project brain that Claude understands from day one.
+A Claude-powered project knowledge system for Loka engagements. Fork it, configure it in 2 minutes, and have a working project brain that Claude understands from day one.
 
 Structured the way a TPM thinks — so whether you're an ML Lead, Tech Lead, or shadowing engineer, the brain helps you work like a TPM would: tracking stakeholders, organizing by SOW, running working sessions, and generating TLUs.
 
