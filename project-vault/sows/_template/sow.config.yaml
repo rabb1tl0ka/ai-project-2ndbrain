@@ -17,3 +17,8 @@ SLACK_CHANNELS: ""
 # (Optional) Comma-separated Gemini note doc URLs
 # Use when notes aren't all in one folder, or you want to point to specific docs directly
 GEMINI_NOTES_DOCS: ""
+
+# (Optional) Notion project page URL for this SOW
+# Used by /publish-to-notion (write) and /bootstrap (read)
+# Open the Notion page and paste the URL
+NOTION_PROJECT_URL: ""

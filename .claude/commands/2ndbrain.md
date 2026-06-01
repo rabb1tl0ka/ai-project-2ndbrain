@@ -77,6 +77,7 @@ For each SOW directory in `project-vault/sows/` (excluding `_template`), in orde
 3. Count `.md` files in `project-vault/sows/<sow>/meeting-summaries/` (0 if directory doesn't exist).
 4. Check if `project-vault/sows/<sow>/slack-context.md` exists.
 5. Read `SLACK_CHANNELS` from `sow.config.yaml` (empty string if not set).
+6. Read `NOTION_PROJECT_URL` from `sow.config.yaml` (empty string if not set).
 
 Print:
 
@@ -92,7 +93,8 @@ Owner:   <OWNER_NAME> (<OWNER_ROLE>, <OWNER_HANDLE>)
 SOWs:
   • <sow> — <DESCRIPTION>
              <N> meeting summaries, slack context ✓/✗
-             Slack: <SLACK_CHANNELS or "(none configured)">
+             Slack:   <SLACK_CHANNELS or "(none configured)">
+             Notion:  <NOTION_PROJECT_URL or "(none configured)">
 
   (repeat for each SOW)
 
