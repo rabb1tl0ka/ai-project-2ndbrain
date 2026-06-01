@@ -8,3 +8,4 @@ Ideas, challenges, and features for the template repo itself.
 
 | File | Phase | Status | Priority | Deps | Owner | One-Line Overview |
 |------|-------|--------|----------|------|-------|-------------------|
+| [feat-notion-channel](feat-notion-channel/feat-notion-channel.md) | | 🚧 in-progress | high | | @brunocoelho | Bidirectional Notion integration that lets users publish SOW artifacts to Notion and ingest existing Notion pages as a data source during bootstrap. |

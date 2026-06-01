@@ -21,7 +21,9 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 2. **If `--sow <name>` was passed:**
    - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
-   - If `sows/<name>/` exists: skip to **For each SOW**, processing only `<name>`.
+   - If `sows/<name>/` exists: check whether it has already been bootstrapped by counting `.md` files in `sows/<name>/meeting-summaries/` and checking if `sows/<name>/slack-context.md` exists. If either has content, warn:
+     > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
+     Stop if declined. Otherwise continue to **For each SOW**, processing only `<name>`.
 
 3. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
    If none found, stop:
@@ -202,6 +204,51 @@ If no Slack channels are configured, skip and note it.
 
 ---
 
+### E — Notion channel
+
+Read `NOTION_PROJECT_URL` from the SOW config.
+
+If empty or not set, ask:
+> "Do you have a Notion project URL for [sow]? Paste it to pull Notion context, or press enter to skip."
+
+- If they paste a URL: write it back to `sows/<sow>/sow.config.yaml` as `NOTION_PROJECT_URL: "<url>"`, then continue.
+- If they press enter: note it and skip the rest of this section.
+
+If set:
+
+1. **Check Notion connector.** If unavailable, print:
+   > "⚠ NOTION_PROJECT_URL is set for [sow] but the Notion connector isn't available. Skipping Notion channel. Enable it in Claude settings to pull Notion context during bootstrap."
+
+   Skip the rest of this section.
+
+2. **Fetch child pages.** Using the Notion MCP, list all child pages of `NOTION_PROJECT_URL`.
+   If none found, note it and skip.
+
+3. **Read each child page.** For each child page, read its full content.
+
+4. **Synthesize into `sows/<sow>/notion-context.md`:**
+
+```markdown
+---
+last_updated: YYYY-MM-DD
+source: <NOTION_PROJECT_URL>
+---
+
+# Notion Context — <sow>
+
+## Summary
+(2-3 sentences: what's published here, what it tells us about project status or decisions)
+
+## Pages found
+| Title | Last edited | Key content |
+|-------|-------------|-------------|
+
+## Key information extracted
+-
+```
+
+---
+
 ## After all SOWs — Stakeholder stubs
 
 Collect all non-@loka.com people identified across all SOWs (meeting attendees + Slack participants).
@@ -301,9 +348,10 @@ sows_processed: <comma-separated list>
 Bootstrap complete.
 
 <for each SOW>
-✓  [sow] SOW doc       → sows/<sow>/<sow>-reference.md
-✓  [sow] N meetings    → sows/<sow>/meeting-summaries/
-✓  [sow] Slack context → sows/<sow>/slack-context.md
+✓  [sow] SOW doc        → sows/<sow>/<sow>-reference.md
+✓  [sow] N meetings     → sows/<sow>/meeting-summaries/
+✓  [sow] Slack context  → sows/<sow>/slack-context.md
+✓  [sow] Notion context → sows/<sow>/notion-context.md  (or "skipped — not configured")
 
 ✓  M stakeholder stubs → stakeholders/
 ✓  Context snapshot    → notes/project-context.md
