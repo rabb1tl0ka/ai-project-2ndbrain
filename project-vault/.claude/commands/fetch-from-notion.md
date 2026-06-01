@@ -52,11 +52,23 @@ Stop.
 
 ### 2 — Read each child page
 
-For each child page, read its full content.
+For each child page, read its full content. Note its title and any relational properties (especially fields named "Previous Update", "Previous", or similar back-link fields).
 
-### 3 — Write notion-context.md
+### 3 — Traverse TLU chains
 
-Synthesize into `sows/<sow>/notion-context.md`, overwriting any previous version:
+After reading all direct child pages, look for any that appear to be TLU (Traffic Light Update) entries — typically identified by date-based titles (e.g. "Jun 01", "May 25") or a "Traffic Light" / "Status" property.
+
+For each TLU page found:
+1. Check for a "Previous Update" relational property (or equivalent back-link field).
+2. If it points to another page, fetch that page.
+3. Repeat until the chain ends (no further "Previous Update" link or the page is empty).
+4. Collect all TLU pages in chronological order (oldest → newest).
+
+Read the full content of each TLU page in the chain. Skip pages that are empty but note they exist.
+
+### 4 — Write notion-context.md
+
+Synthesize everything — direct child pages + full TLU chain — into `sows/<sow>/notion-context.md`, overwriting any previous version:
 
 ```markdown
 ---
@@ -73,13 +85,22 @@ source: <NOTION_PROJECT_URL>
 | Title | Last edited | Key content |
 |-------|-------------|-------------|
 
+## TLU History
+(TLU entries in reverse chronological order — most recent first)
+
+| Date | Status | Key updates | Blockers |
+|------|--------|-------------|----------|
+
 ## Key information extracted
 -
+
+## ⚠ Flags
+(anything worth surfacing: unapproved SOWs, missing TLUs, compliance gaps, access limitations)
 ```
 
-### 4 — Report
+### 5 — Report
 
 ```
 ✓ Notion context updated → sows/<sow>/notion-context.md
-  N pages read from <NOTION_PROJECT_URL>
+  N pages read (M direct + K TLU entries)
 ```
