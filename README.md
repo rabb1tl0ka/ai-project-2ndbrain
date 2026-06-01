@@ -47,14 +47,7 @@ Claude will ask you for each config value, write `project.config.yaml`, replace 
 
 `project.config.yaml` is gitignored — your config is never committed.
 
-**3. Commit and push**
-
-```bash
-git add -A && git commit -m "init: configure project brain"
-git push
-```
-
-**4. Enter the vault and bootstrap**
+**3. Enter the vault and bootstrap**
 
 ```bash
 cd project-vault
@@ -68,11 +61,24 @@ Then run:
 
 This pulls in the SOW document, all historical meeting notes from Google Drive, and recent Slack history — then generates a context snapshot, stakeholder stubs, and a tensions/gaps report between what the SOW commits to and what's actually happening in the project.
 
-**5. Fill in any gaps**
+**4. Fill in any gaps**
 
 Open `notes/project-context.md` — that's your ground truth. Fill in team profiles in `team/`, enrich stakeholder profiles in `stakeholders/`, and address any tensions flagged by bootstrap.
 
+**5. Commit and push**
+
+```bash
+git add -A && git commit -m "init: configure project brain"
+git push
+```
+
+**6. Orient yourself anytime**
+
+From the repo root, run `/2ndbrain` — it reads your current state and tells you exactly what to do next.
+
 ## How to use it
+
+**Not sure where you are?** → run `/2ndbrain` from the repo root — it checks your setup state and tells you the next step
 
 **Capture anything** → drop it in `inbox/` and ask Claude to process it
 
