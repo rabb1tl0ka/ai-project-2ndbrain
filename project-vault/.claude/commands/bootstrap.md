@@ -206,7 +206,11 @@ If no Slack channels are configured, skip and note it.
 
 Read `NOTION_PROJECT_URL` from the SOW config.
 
-If empty or not set, skip this section silently.
+If empty or not set, ask:
+> "Do you have a Notion project URL for [sow]? Paste it to pull Notion context, or press enter to skip."
+
+- If they paste a URL: write it back to `sows/<sow>/sow.config.yaml` as `NOTION_PROJECT_URL: "<url>"`, then continue.
+- If they press enter: note it and skip the rest of this section.
 
 If set:
 
