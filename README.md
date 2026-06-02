@@ -69,6 +69,43 @@ git push
 
 Run `/2ndbrain` — it reads your current state and tells you exactly what to do next.
 
+## Commands
+
+All commands run from the repo root in a Claude Code session (`claude`).
+
+### Setup
+
+| Command | When to run | What it does |
+|---------|------------|--------------|
+| `/onboard` | Once, after forking | Collects client name, owner info, SOW list. Writes `config.yaml`, replaces placeholders, creates SOW dirs. |
+| `/bootstrap` | Once per SOW, after onboard | Pulls SOW doc, meeting notes, Slack history, and Notion context into the vault. Generates stakeholder stubs and a tensions/gaps report. |
+| `/bootstrap --sow <name>` | When adding a new SOW | Creates the SOW dir, collects its config, and bootstraps it. |
+
+### Ongoing
+
+| Command | What it does |
+|---------|-------------|
+| `/2ndbrain` | Orientation — shows current setup state, SOW summary, and notifies if a template update is available. |
+| `/meeting-recap` | Picks up new Gemini meeting notes from Drive since last run. Incremental — only processes what's new. |
+| `/meeting-recap --keywords <words>` | Search for specific keywords in recent meetings. |
+| `/meeting-recap --date <date>` | Fetch meetings from a specific date. |
+
+### Notion
+
+| Command | What it does |
+|---------|-------------|
+| `/publish-to-notion <file>` | Publishes any vault `.md` file to Notion as a child page of the SOW's project page. Idempotent — republishing updates the existing page. |
+| `/fetch-from-notion [sow]` | Pulls all child pages from the Notion project page, traverses TLU history chains, writes `notion-context.md`. |
+
+### Maintenance
+
+| Command | What it does |
+|---------|-------------|
+| `/upgrade` | Checks if a newer version of the template is available. |
+| `/upgrade --apply` | Pulls the latest tooling from the template repo and commits it. Never touches your project content. |
+
+---
+
 ## How to use it
 
 **Not sure where you are?** → run `/2ndbrain` — checks setup state and tells you the next step
@@ -84,12 +121,6 @@ Run `/2ndbrain` — it reads your current state and tells you exactly what to do
 **Log a meeting** → ask Claude: *"log this meeting summary"* — saves to the right SOW
 
 **Track an idea or challenge** → ask Claude: *"save this as an idea"* — goes to `roadmap/`
-
-**Pick up new meetings** → run `/meeting-recap` — incremental, only processes what's new since last run
-
-**Publish to Notion** → run `/publish-to-notion <file>` — pushes any `.md` file as a child page of the SOW's Notion project page (idempotent: republishing updates the existing page)
-
-**Pull from Notion** → run `/fetch-from-notion [sow-name]` — reads child pages and follows the TLU Previous Update chain, writing everything to `sows/<sow>/notion-context.md`
 
 ## Notion channel
 
