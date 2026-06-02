@@ -147,21 +147,7 @@ This sets up your local `config.yaml` (name, role) and any SOW directories you'r
 
 `config.yaml` is gitignored — it never gets committed.
 
-**3. Create your SOW branch**
-
-Ask the engagement owner which SOW you're contributing to, then:
-```bash
-git checkout -b sow1/yourname   # contributor to an existing SOW
-git push -u origin sow1/yourname
-```
-
-If you're the lead on your own SOW:
-```bash
-git checkout -b sow2
-git push -u origin sow2
-```
-
-**4. Orient yourself**
+**3. Orient yourself**
 ```
 /2ndbrain
 ```
