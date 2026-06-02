@@ -11,8 +11,11 @@ Read `config.yaml` if it exists.
 - If it exists and has real values (no placeholder defaults), show a summary and ask:
   > "A config already exists. Update it, or proceed with current values?
   > (u) Update — I'll ask you each field again
-  > (p) Proceed — apply the existing config as-is"
+  > (p) Proceed — apply the existing config as-is
+  > (s) Skip —  skip creating the config"
+
   If the user chooses proceed, jump to Step 3.
+  If the user choose to skip, jump to Step 5.
 
 - If it doesn't exist, continue to Step 2.
 
