@@ -16,16 +16,13 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 ## Pre-flight
 
-1. Read `../project.config.yaml`. Extract `PROJECT_NAME`. If it's still the literal string `{{PROJECT_NAME}}` or the file doesn't exist, stop:
-   > "Onboarding hasn't been run yet. Run `/onboard` from the repo root first, then come back."
-
-2. **If `--sow <name>` was passed:**
+1. **If `--sow <name>` was passed:**
    - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
    - If `sows/<name>/` exists: check whether it has already been bootstrapped by counting `.md` files in `sows/<name>/meeting-summaries/` and checking if `sows/<name>/slack-context.md` exists. If either has content, warn:
      > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
      Stop if declined. Otherwise continue to **For each SOW**, processing only `<name>`.
 
-3. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
+2. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
    If none found, stop:
    > "No SOWs found. Run `/onboard` to set them up first, or run `/bootstrap --sow <name>` to add one now."
    Read `.bootstrap-state.md`. If `last_ran` has a date, warn:
@@ -96,7 +93,7 @@ The SOW is the source of truth for what Loka is contractually obliged to deliver
 
    Rules:
    - Exclude files with "Template" in the name.
-   - Prefer files that also contain `PROJECT_NAME`. If still ambiguous, list candidates and ask which to use.
+   - If still ambiguous, list candidates and ask which to use.
 
 3. If nothing is found, ask:
    > "I couldn't find the SOW document for [sow]. You can:
@@ -128,7 +125,7 @@ If it still has template placeholders, replace with extracted content. If it alr
 
 Priority order:
 
-1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), search for ALL files whose names contain `PROJECT_NAME` — no date filter, full historical sweep.
+1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), list ALL files in the folder — no date filter, full historical sweep.
 
 2. `DRIVE_FOLDER` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
 
@@ -298,7 +295,7 @@ generated_by: /bootstrap
 sows_processed: [list]
 ---
 
-# Project Context — PROJECT_NAME
+# Project Context — {{CLIENT_NAME}}
 
 ## What this engagement is
 (1-2 sentences from SOW docs + meetings + Slack — what is Loka actually doing?)

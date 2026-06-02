@@ -2,6 +2,13 @@
 # Created by /onboard — edit directly to update.
 # This file is committed to the repo so the whole team shares it.
 
+# What type of engagement this SOW is (e.g. "GenAI Assessment", "POC", "Staff Augmentation")
+ENGAGEMENT_TYPE: ""
+
+# 1-2 sentences describing what Loka is building or delivering for this client under this SOW
+ENGAGEMENT_CONTEXT: ""
+
+
 # Google Drive folder URL containing Gemini meeting notes for this SOW
 # Open the folder in Drive and paste the URL
 DRIVE_FOLDER: ""
