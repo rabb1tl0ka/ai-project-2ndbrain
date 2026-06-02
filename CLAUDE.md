@@ -31,6 +31,34 @@ Run `git pull` before starting any session to make sure you're on the latest ver
 
 If this is the very first session and the vault hasn't been loaded yet, run `/bootstrap` — it pulls the SOW, meeting notes, and Slack history into the vault so Claude has real project context from the start.
 
+## Collaboration Model
+
+This repo may have multiple contributors (e.g. two TPMs, each owning a different SOW). Main is protected — direct pushes are rejected by GitHub.
+
+**Recommended pattern: long-lived SOW branch per PM**
+
+Each PM owns a persistent branch tied to their SOW (e.g. `sow2/alice`). On that branch they commit and push freely — no PRs, no approvals, no friction. Periodically (end of week, before a TLU, at a milestone) they open a PR from their SOW branch into main, the other PM approves in seconds, and it merges. Everyone pulls main to get each other's updates.
+
+- **Daily**: commit and push freely to your SOW branch
+- **Periodically**: PR from `<sow>/<name>` → main, lightweight approval, merge, pull
+
+To keep merges easy, pull main into the SOW branch regularly: `git merge main` or `git rebase main`. The longer the branch drifts, the harder the eventual merge.
+
+**For one-off changes** (not tied to a specific SOW): use a short-lived branch, open a PR when ready, merge and delete.
+
+**If a `git push` to main fails with a GitHub branch protection error**, that's expected. Tell the user:
+> "Main is protected on this repo. Let me set up your SOW branch instead."
+Then:
+1. Create their SOW branch: `git checkout -b <sow>/<name>` (e.g. `sow2/alice`)
+2. Push it: `git push -u origin <sow>/<name>`
+3. Explain they work here freely and open a PR to main when ready
+
+**Why this model:** SOW directories are non-overlapping so merge conflicts are rare. PRs to main are about visibility and shared history, not gatekeeping. Any contributor with Write access can approve.
+
+**If the user is the repo owner** and gets a protection error: use a PR like anyone else, or bypass protection in GitHub settings for an emergency direct push.
+
+---
+
 ## Who are you?
 
 At the start of each session, check whether the user has identified themselves (name and role). Look for this in their global `~/.claude/CLAUDE.md` or anything they've said in the current conversation.
