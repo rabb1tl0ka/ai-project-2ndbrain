@@ -9,18 +9,19 @@ ENGAGEMENT_TYPE: ""
 ENGAGEMENT_CONTEXT: ""
 
 
-# Google Drive folder URL containing Gemini meeting notes for this SOW
-# Open the folder in Drive and paste the URL
-DRIVE_FOLDER: ""
+# Google Drive folder URL(s) containing Gemini meeting notes for this SOW
+# Comma-separated — add multiple folders if client and internal notes live in separate places
+# Example: "https://drive.google.com/drive/folders/abc, https://drive.google.com/drive/folders/xyz"
+DRIVE_FOLDERS: ""
 
-# Filename filter for meeting notes (optional but required when DRIVE_FOLDER is a shared folder
-# like My Drive > Meet Recordings rather than a SOW-specific folder).
-# Only files whose names contain this string will be processed.
+# Filename filter for meeting notes (optional but required when any DRIVE_FOLDERS entry is a shared
+# folder like My Drive > Meet Recordings rather than a SOW-specific folder).
+# Only files whose names contain this string will be processed across all folders.
 # Example: "ZenQMS", "ZenQMS SOW4", "CS " (note trailing space to avoid matching "CSS")
 MEETING_FILTER: ""
 
 # Direct URL to the SOW / Scope of Work document in Google Drive (optional)
-# If empty, /bootstrap will search DRIVE_FOLDER for files named "SOW", "Scope of Work", or "Implementation Proposal"
+# If empty, /bootstrap will search DRIVE_FOLDERS for files named "SOW", "Scope of Work", or "Implementation Proposal"
 SOW_DOC_URL: ""
 
 # Slack channel(s) for this SOW — comma-separated, include the # prefix

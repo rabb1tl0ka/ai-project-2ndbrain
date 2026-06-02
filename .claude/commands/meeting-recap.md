@@ -7,12 +7,12 @@ Process Gemini meeting notes from Google Drive into structured meeting summaries
    - If only one SOW exists, use it.
    - If multiple SOWs exist, ask: "Which SOW are you recapping meetings for? [list options]"
 
-2. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDER` and `MEETING_FILTER`. If `DRIVE_FOLDER` is empty, ask:
-   > "No Drive folder configured for [sow]. Paste the Google Drive folder URL for the meeting notes."
+2. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `MEETING_FILTER`. If `DRIVE_FOLDERS` is empty, ask:
+   > "No Drive folder configured for [sow]. Paste one or more Google Drive folder URLs (comma-separated) for the meeting notes."
 
 ## Configuration
 
-- **Drive folder**: DRIVE_FOLDER (read from `sows/<sow>/sow.config.yaml`)
+- **Drive folder**: DRIVE_FOLDERS (read from `sows/<sow>/sow.config.yaml`)
 - **Meeting filter**: MEETING_FILTER (read from `sows/<sow>/sow.config.yaml` — optional, applied when set)
 - **State file**: `.meeting-recap-state.md` (repo root)
 - **Summary template**: `templates/meeting-summary.md`
@@ -30,8 +30,8 @@ Example: `CS GCP Cost Optimization - 2026/05/28 14:22 WEST - Notes by Gemini`
 ### Default — `/meeting-recap`
 
 1. Read `.meeting-recap-state.md` for `last_ran`. If missing or empty, default to 7 days ago.
-2. Extract the Drive folder ID from the configured URL (last path segment after `/folders/`).
-3. Search the folder for files modified after `last_ran`. If `MEETING_FILTER` is set, only include files whose names contain that string.
+2. Parse `DRIVE_FOLDERS` as comma-separated URLs. For each folder, extract the folder ID (last segment after `/folders/`).
+3. Search each folder for files modified after `last_ran`. Deduplicate across folders by file ID. If `MEETING_FILTER` is set, only include files whose names contain that string.
 4. Process each match (see **Processing** below).
 5. Report: "Processed N meetings since <last_ran>." If MEETING_FILTER was applied, note it: "(filtered by '<MEETING_FILTER>')"
 6. Update `last_ran` in `.meeting-recap-state.md` to today's date.

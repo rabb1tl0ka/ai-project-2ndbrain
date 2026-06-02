@@ -106,15 +106,15 @@ If `sows/<sow>` already exists, skip the copy and note it.
    > (e.g. `Loka is building a RAG-based document search system for ZenQMS's compliance team.`)
    > Press enter to skip."
 
-3. **DRIVE_FOLDER** (required — press enter to skip and fill in later)
-   > "Google Drive folder URL for [sow] meeting notes.
-   > Open the folder in Drive and paste the URL.
-   > (e.g. `https://drive.google.com/drive/folders/abc123`)"
+3. **DRIVE_FOLDERS** (required — press enter to skip and fill in later)
+   > "Google Drive folder URL(s) for [sow] meeting notes — comma-separated if you have multiple (e.g. separate folders for client and internal calls).
+   > Open each folder in Drive and paste the URL(s).
+   > (e.g. `https://drive.google.com/drive/folders/abc123, https://drive.google.com/drive/folders/xyz456`)"
 
-4. **MEETING_FILTER** (optional — only needed if DRIVE_FOLDER is a shared folder like Meet Recordings)
-   > "Is this a SOW-specific folder, or a shared folder like Meet Recordings?
-   > If shared, paste the string that identifies this project's meetings in the filename.
-   > (e.g. `ZenQMS`, `ZenQMS SOW4`, `CS `) — press enter to skip if the folder is already SOW-specific."
+4. **MEETING_FILTER** (optional — only needed if any folder is shared, like Meet Recordings)
+   > "Are any of these folders shared (e.g. My Drive > Meet Recordings with mixed projects)?
+   > If so, paste the string that identifies this project's meetings in the filename.
+   > (e.g. `ZenQMS`, `ZenQMS SOW4`, `CS `) — press enter to skip if all folders are already SOW-specific."
 
 6. **SOW_DOC_URL** (optional)
    > "Direct link to the SOW / Scope of Work document in Google Drive.
@@ -139,7 +139,7 @@ If `sows/<sow>` already exists, skip the copy and note it.
 
 ENGAGEMENT_TYPE: "<value or empty>"
 ENGAGEMENT_CONTEXT: "<value or empty>"
-DRIVE_FOLDER: "<value or empty>"
+DRIVE_FOLDERS: "<value or empty>"
 MEETING_FILTER: "<value or empty>"
 SOW_DOC_URL: "<value or empty>"
 SLACK_CHANNELS: "<value or empty>"
@@ -171,5 +171,5 @@ If any per-SOW fields were skipped, list them:
 
 ```
 ⚠  These SOW config fields were left empty — fill them in before running /bootstrap:
-   - sows/<sow>/sow.config.yaml → DRIVE_FOLDER
+   - sows/<sow>/sow.config.yaml → DRIVE_FOLDERS
 ```

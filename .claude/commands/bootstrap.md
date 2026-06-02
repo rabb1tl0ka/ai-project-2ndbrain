@@ -41,8 +41,8 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 2. Ask for per-SOW config (press enter to skip optional fields):
 
-   - **DRIVE_FOLDER** — "Google Drive folder URL for <name> meeting notes. Paste the URL. (Press enter to skip and fill in later.)"
-   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDER automatically.)"
+   - **DRIVE_FOLDERS** — "Google Drive folder URL(s) for <name> meeting notes — comma-separated if you have multiple. (Press enter to skip and fill in later.)"
+   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDERS automatically.)"
    - **SLACK_CHANNELS** — "Slack channel(s) for <name>, comma-separated with # prefix. (Press enter to skip.)"
    - **GEMINI_NOTES_DOCS** — "Specific Gemini note doc URLs for <name>, comma-separated. Only needed if notes aren't all in one folder. (Press enter to skip.)"
 
@@ -51,7 +51,8 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
    # SOW Configuration — <name>
    # Created by /bootstrap --sow <name>
 
-   DRIVE_FOLDER: "<value or empty>"
+   DRIVE_FOLDERS: "<value or empty>"
+   MEETING_FILTER: "<value or empty>"
    SOW_DOC_URL: "<value or empty>"
    SLACK_CHANNELS: "<value or empty>"
    GEMINI_NOTES_DOCS: "<value or empty>"
@@ -68,7 +69,7 @@ Process every discovered SOW in order. For each `<sow>`:
 ### A — Read SOW config
 
 Read `sows/<sow>/sow.config.yaml`. Extract:
-- `DRIVE_FOLDER`
+- `DRIVE_FOLDERS`
 - `MEETING_FILTER`
 - `SOW_DOC_URL`
 - `SLACK_CHANNELS`
@@ -87,7 +88,7 @@ The SOW is the source of truth for what Loka is contractually obliged to deliver
 
 1. If `SOW_DOC_URL` is a real URL (not empty), read it directly via Google Drive MCP.
 
-2. Otherwise, search `DRIVE_FOLDER` for files whose names contain any of:
+2. Otherwise, search each folder in `DRIVE_FOLDERS` for files whose names contain any of:
    - "SOW"
    - "Scope of Work"
    - "Implementation Proposal"
@@ -126,9 +127,9 @@ If it still has template placeholders, replace with extracted content. If it alr
 
 Priority order:
 
-1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), list all files in the folder — no date filter, full historical sweep. If `MEETING_FILTER` is set, only process files whose names contain that string.
+1. `DRIVE_FOLDERS` is set: parse as comma-separated URLs. For each folder, extract the folder ID (last segment after `/folders/`) and list all files — no date filter, full historical sweep. Deduplicate across folders by file ID. If `MEETING_FILTER` is set, only process files whose names contain that string.
 
-2. `DRIVE_FOLDER` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
+2. `DRIVE_FOLDERS` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
 
 3. Both empty: ask:
    > "No Drive source configured for [sow]. Paste either:
