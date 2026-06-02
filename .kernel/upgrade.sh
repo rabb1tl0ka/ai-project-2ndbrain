@@ -125,10 +125,6 @@ copy_file "sows/_template/sow-reference.md"
 # Vault templates (meeting summary, TLU, working session)
 copy_dir "templates"
 
-# Roadmap conventions and item templates
-copy_file "roadmap/CLAUDE.md"
-copy_dir "roadmap/templates"
-
 # Upgrade script itself (so users always have the latest upgrader)
 copy_file ".kernel/upgrade.sh"
 
@@ -147,8 +143,6 @@ STAGED_PATHS=(
     "README.md"
     "sows/_template/"
     "templates/"
-    "roadmap/CLAUDE.md"
-    "roadmap/templates/"
     ".kernel/.2ndbrain-version"
     ".kernel/upgrade.sh"
 )
@@ -205,7 +199,6 @@ ${CHANGELOG_MD}
 - \`config.example.yaml\` — config reference
 - \`sows/_template/\` — SOW config and reference templates
 - \`templates/\` — meeting summary, TLU, working session templates
-- \`roadmap/\` — roadmap conventions and item templates
 EOF
 )")
 
