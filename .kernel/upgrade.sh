@@ -2,16 +2,18 @@
 # Upgrade an existing ai-project-2ndbrain install to the current version.
 #
 # Copies pure tooling files (commands, templates, conventions).
-# Never touches project-specific content (CLAUDE.md in vault, sow dirs, stakeholders, notes).
+# Never touches project-specific content (CLAUDE.md after onboard, sow dirs,
+# stakeholders, team, notes, inbox, archive).
 #
-# Usage: bash upgrade.sh <target-repo-path> [--create-pr]
-# Example: bash upgrade.sh ~/loka/projects/health-edge-ai-2ndbrain
-#          bash upgrade.sh ~/loka/projects/health-edge-ai-2ndbrain --create-pr
+# Run this FROM the template repo, pointing AT the target repo:
+#   bash .kernel/upgrade.sh ~/loka/projects/zenqms-ai-2ndbrain
+#   bash .kernel/upgrade.sh ~/loka/projects/zenqms-ai-2ndbrain --create-pr
 
 set -e
 
-TARGET="$1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"   # template repo root
+TARGET="$1"
 
 # ── Flag parsing ──────────────────────────────────────────────────────────────
 
@@ -25,7 +27,7 @@ done
 # ── Validation ────────────────────────────────────────────────────────────────
 
 if [ -z "$TARGET" ]; then
-    echo "Usage: bash upgrade.sh <target-repo-path> [--create-pr]"
+    echo "Usage: bash .kernel/upgrade.sh <target-repo-path> [--create-pr]"
     exit 1
 fi
 
@@ -39,8 +41,8 @@ if [ ! -d "$TARGET/.git" ]; then
     exit 1
 fi
 
-if [ ! -f "$TARGET/project-vault/CLAUDE.md" ]; then
-    echo "Error: '$TARGET' doesn't look like an ai-project-2ndbrain repo (project-vault/CLAUDE.md missing)."
+if [ ! -f "$TARGET/CLAUDE.md" ] || [ ! -d "$TARGET/sows" ]; then
+    echo "Error: '$TARGET' doesn't look like an ai-project-2ndbrain repo (CLAUDE.md or sows/ missing)."
     exit 1
 fi
 
@@ -50,8 +52,8 @@ fi
 
 # ── Version info ──────────────────────────────────────────────────────────────
 
-CURRENT_TAG=$(git -C "$SCRIPT_DIR" describe --tags --abbrev=0 2>/dev/null || echo "untagged")
-VERSION_FILE="$TARGET/.2ndbrain-version"
+CURRENT_TAG=$(git -C "$REPO_DIR" describe --tags --abbrev=0 2>/dev/null || echo "untagged")
+VERSION_FILE="$TARGET/.kernel/.2ndbrain-version"
 
 if [ -f "$VERSION_FILE" ]; then
     LAST_TAG=$(cat "$VERSION_FILE")
@@ -64,27 +66,25 @@ echo "Version: $LAST_TAG → $CURRENT_TAG"
 echo "Target:  $TARGET"
 echo ""
 
-# ── Files to upgrade ─────────────────────────────────────────────────────────
-# Pure tooling only. project-vault/CLAUDE.md is intentionally excluded —
-# it gets personalized by /onboard and must not be overwritten.
+# ── Copy helpers ──────────────────────────────────────────────────────────────
 
 copy_file() {
     local rel="$1"
-    local src="$SCRIPT_DIR/$rel"
+    local src="$REPO_DIR/$rel"
     local dst="$TARGET/$rel"
 
     if [ ! -f "$src" ]; then
-        return  # file doesn't exist in template (e.g. new addition not yet released)
+        return
     fi
 
     mkdir -p "$(dirname "$dst")"
     cp "$src" "$dst"
-    echo "✅ $rel"
+    echo "  ✓ $rel"
 }
 
 copy_dir() {
     local rel="$1"
-    local src="$SCRIPT_DIR/$rel"
+    local src="$REPO_DIR/$rel"
     local dst="$TARGET/$rel"
 
     if [ ! -d "$src" ]; then
@@ -93,54 +93,60 @@ copy_dir() {
 
     mkdir -p "$dst"
     cp -r "$src/." "$dst/"
-    echo "✅ $rel/"
+    echo "  ✓ $rel/"
 }
+
+# ── Files to upgrade ─────────────────────────────────────────────────────────
+# Tooling only. CLAUDE.md is excluded after onboard — it has real client values.
+# sows/, stakeholders/, team/, notes/, inbox/, archive/ are never touched.
 
 echo "Copying tooling files..."
 echo ""
 
-# Root-level commands and config
+# Commands (all in one place now)
 copy_file ".claude/commands/2ndbrain.md"
 copy_file ".claude/commands/onboard.md"
-copy_file "CLAUDE.md"
-copy_file "README.md"
-copy_file "project.config.example.yaml"
+copy_file ".claude/commands/bootstrap.md"
+copy_file ".claude/commands/meeting-recap.md"
+copy_file ".claude/commands/publish-to-notion.md"
+copy_file ".claude/commands/fetch-from-notion.md"
 
-# Vault commands (the core of what users run)
-copy_file "project-vault/.claude/commands/bootstrap.md"
-copy_file "project-vault/.claude/commands/meeting-recap.md"
-copy_file "project-vault/.claude/commands/publish-to-notion.md"
+# Config reference (never the actual config.yaml — that's gitignored user data)
+copy_file "config.example.yaml"
+
+# README
+copy_file "README.md"
 
 # SOW template (safe — not an actual SOW, just the blank starting point)
-copy_file "project-vault/sows/_template/sow.config.yaml"
-copy_file "project-vault/sows/_template/sow-reference.md"
+copy_file "sows/_template/sow.config.yaml"
+copy_file "sows/_template/sow-reference.md"
 
 # Vault templates (meeting summary, TLU, working session)
-copy_dir "project-vault/templates"
+copy_dir "templates"
 
-# Roadmap conventions and item templates (engagement roadmap)
-copy_file "project-vault/roadmap/CLAUDE.md"
-copy_dir "project-vault/roadmap/templates"
+# Roadmap conventions and item templates
+copy_file "roadmap/CLAUDE.md"
+copy_dir "roadmap/templates"
 
-# .kernel conventions (brain repo internal roadmap)
-copy_file ".kernel/roadmap/CLAUDE.md"
-
-echo ""
-
-# ── Ensure new directories exist ─────────────────────────────────────────────
-
-# publish-to-notion is new — target may not have the command dir setting yet
-if [ ! -f "$TARGET/project-vault/.claude/settings.local.json" ] && [ -f "$SCRIPT_DIR/project-vault/.claude/settings.local.json" ]; then
-    copy_file "project-vault/.claude/settings.local.json"
-fi
-
-# ── Update version file ───────────────────────────────────────────────────────
-
+# Version stamp
+mkdir -p "$TARGET/.kernel"
 echo "$CURRENT_TAG" > "$VERSION_FILE"
-echo "✅ .2ndbrain-version → $CURRENT_TAG"
+echo "  ✓ .kernel/.2ndbrain-version → $CURRENT_TAG"
+
 echo ""
 
 # ── Commit and optionally create PR ──────────────────────────────────────────
+
+STAGED_PATHS=(
+    ".claude/commands/"
+    "config.example.yaml"
+    "README.md"
+    "sows/_template/"
+    "templates/"
+    "roadmap/CLAUDE.md"
+    "roadmap/templates/"
+    ".kernel/.2ndbrain-version"
+)
 
 if [ "$CREATE_PR" = true ]; then
     BRANCH="chore/2ndbrain-upgrade-${CURRENT_TAG}"
@@ -151,19 +157,10 @@ if [ "$CREATE_PR" = true ]; then
     fi
 
     git -C "$TARGET" checkout -b "$BRANCH"
-    git -C "$TARGET" add \
-        .claude/commands/ \
-        CLAUDE.md README.md project.config.example.yaml \
-        project-vault/.claude/commands/ \
-        project-vault/sows/_template/ \
-        project-vault/templates/ \
-        project-vault/roadmap/CLAUDE.md \
-        project-vault/roadmap/templates/ \
-        .kernel/roadmap/CLAUDE.md \
-        .2ndbrain-version 2>/dev/null || true
+    git -C "$TARGET" add "${STAGED_PATHS[@]}" 2>/dev/null || true
     git -C "$TARGET" commit -m "chore: upgrade ai-project-2ndbrain ${LAST_TAG} → ${CURRENT_TAG}"
     git -C "$TARGET" push -u origin "$BRANCH"
-    echo "✅ Branch '$BRANCH' pushed"
+    echo "✓ Branch '$BRANCH' pushed"
 
     if ! command -v gh &>/dev/null; then
         echo ""
@@ -173,11 +170,11 @@ if [ "$CREATE_PR" = true ]; then
 
     if ! gh auth status &>/dev/null; then
         echo ""
-        echo "⚠️  gh not authenticated — create the PR manually or run: gh auth login"
+        echo "⚠️  gh not authenticated — run: gh auth login"
         exit 0
     fi
 
-    CHANGELOG=$(git -C "$SCRIPT_DIR" log "${LAST_TAG}..HEAD" --oneline 2>/dev/null || true)
+    CHANGELOG=$(git -C "$REPO_DIR" log "${LAST_TAG}..HEAD" --oneline 2>/dev/null || true)
     if [ -z "$CHANGELOG" ]; then
         CHANGELOG_MD="- No changelog available (tags missing or first install)."
     else
@@ -193,32 +190,30 @@ if [ "$CREATE_PR" = true ]; then
         --body "$(cat <<EOF
 ## ai-project-2ndbrain upgrade: ${LAST_TAG} → ${CURRENT_TAG}
 
-Tooling-only upgrade. Project content (vault CLAUDE.md, SOW dirs, stakeholders, notes) is untouched.
+Tooling-only upgrade. Project content (CLAUDE.md post-onboard, SOW dirs, stakeholders, team, notes) is untouched.
 
 ### What changed upstream
 ${CHANGELOG_MD}
 
 ### What was updated
-- \`.claude/commands/\` — root commands
-- \`project-vault/.claude/commands/\` — vault commands (bootstrap, meeting-recap, publish-to-notion)
-- \`project-vault/sows/_template/\` — SOW config template
-- \`project-vault/templates/\` — meeting summary, TLU, working session templates
-- \`project-vault/roadmap/\` — roadmap conventions and templates
+- \`.claude/commands/\` — all commands (onboard, bootstrap, meeting-recap, publish-to-notion, fetch-from-notion, 2ndbrain)
+- \`config.example.yaml\` — config reference
+- \`sows/_template/\` — SOW config and reference templates
+- \`templates/\` — meeting summary, TLU, working session templates
+- \`roadmap/\` — roadmap conventions and item templates
 EOF
 )")
 
     echo ""
-    echo "✅ PR created: $PR_URL"
+    echo "✓ PR created: $PR_URL"
 else
     echo "Upgrade complete. Review changes then commit:"
     echo ""
     echo "  cd $TARGET"
-    echo "  git add .claude/ CLAUDE.md README.md project.config.example.yaml \\"
-    echo "          project-vault/.claude/ project-vault/sows/_template/ \\"
-    echo "          project-vault/templates/ project-vault/roadmap/CLAUDE.md \\"
-    echo "          project-vault/roadmap/templates/ .kernel/roadmap/CLAUDE.md \\"
-    echo "          .2ndbrain-version"
+    printf "  git add"
+    for p in "${STAGED_PATHS[@]}"; do printf " %s" "$p"; done
+    echo ""
     echo "  git commit -m 'chore: upgrade ai-project-2ndbrain ${LAST_TAG} → ${CURRENT_TAG}'"
     echo ""
-    echo "  To create a PR instead: bash upgrade.sh $TARGET --create-pr"
+    echo "  To create a PR instead: bash .kernel/upgrade.sh $TARGET --create-pr"
 fi
