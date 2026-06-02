@@ -1,8 +1,8 @@
 # TLU — Week of YYYY-MM-DD
 
-**Project**: {{PROJECT_NAME}}
+**Client**: {{CLIENT_NAME}}
 **Status**: 🟢 Green | 🟡 Yellow | 🔴 Red
-**Prepared by**: {{OWNER_NAME}}
+**Prepared by**: [your name]
 
 ---
 

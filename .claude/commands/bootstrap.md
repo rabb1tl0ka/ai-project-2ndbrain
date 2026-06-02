@@ -16,16 +16,13 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 ## Pre-flight
 
-1. Read `../project.config.yaml`. Extract `PROJECT_NAME`. If it's still the literal string `{{PROJECT_NAME}}` or the file doesn't exist, stop:
-   > "Onboarding hasn't been run yet. Run `/onboard` from the repo root first, then come back."
-
-2. **If `--sow <name>` was passed:**
+1. **If `--sow <name>` was passed:**
    - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
    - If `sows/<name>/` exists: check whether it has already been bootstrapped by counting `.md` files in `sows/<name>/meeting-summaries/` and checking if `sows/<name>/slack-context.md` exists. If either has content, warn:
      > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
      Stop if declined. Otherwise continue to **For each SOW**, processing only `<name>`.
 
-3. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
+2. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
    If none found, stop:
    > "No SOWs found. Run `/onboard` to set them up first, or run `/bootstrap --sow <name>` to add one now."
    Read `.bootstrap-state.md`. If `last_ran` has a date, warn:
@@ -44,8 +41,8 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 
 2. Ask for per-SOW config (press enter to skip optional fields):
 
-   - **DRIVE_FOLDER** — "Google Drive folder URL for <name> meeting notes. Paste the URL. (Press enter to skip and fill in later.)"
-   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDER automatically.)"
+   - **DRIVE_FOLDERS** — "Google Drive folder URL(s) for <name> meeting notes — comma-separated if you have multiple. (Press enter to skip and fill in later.)"
+   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDERS automatically.)"
    - **SLACK_CHANNELS** — "Slack channel(s) for <name>, comma-separated with # prefix. (Press enter to skip.)"
    - **GEMINI_NOTES_DOCS** — "Specific Gemini note doc URLs for <name>, comma-separated. Only needed if notes aren't all in one folder. (Press enter to skip.)"
 
@@ -54,7 +51,8 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
    # SOW Configuration — <name>
    # Created by /bootstrap --sow <name>
 
-   DRIVE_FOLDER: "<value or empty>"
+   DRIVE_FOLDERS: "<value or empty>"
+   MEETING_FILTER: "<value or empty>"
    SOW_DOC_URL: "<value or empty>"
    SLACK_CHANNELS: "<value or empty>"
    GEMINI_NOTES_DOCS: "<value or empty>"
@@ -71,7 +69,8 @@ Process every discovered SOW in order. For each `<sow>`:
 ### A — Read SOW config
 
 Read `sows/<sow>/sow.config.yaml`. Extract:
-- `DRIVE_FOLDER`
+- `DRIVE_FOLDERS`
+- `MEETING_FILTER`
 - `SOW_DOC_URL`
 - `SLACK_CHANNELS`
 - `GEMINI_NOTES_DOCS`
@@ -89,14 +88,14 @@ The SOW is the source of truth for what Loka is contractually obliged to deliver
 
 1. If `SOW_DOC_URL` is a real URL (not empty), read it directly via Google Drive MCP.
 
-2. Otherwise, search `DRIVE_FOLDER` for files whose names contain any of:
+2. Otherwise, search each folder in `DRIVE_FOLDERS` for files whose names contain any of:
    - "SOW"
    - "Scope of Work"
    - "Implementation Proposal"
 
    Rules:
    - Exclude files with "Template" in the name.
-   - Prefer files that also contain `PROJECT_NAME`. If still ambiguous, list candidates and ask which to use.
+   - If still ambiguous, list candidates and ask which to use.
 
 3. If nothing is found, ask:
    > "I couldn't find the SOW document for [sow]. You can:
@@ -128,9 +127,9 @@ If it still has template placeholders, replace with extracted content. If it alr
 
 Priority order:
 
-1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), search for ALL files whose names contain `PROJECT_NAME` — no date filter, full historical sweep.
+1. `DRIVE_FOLDERS` is set: parse as comma-separated URLs. For each folder, extract the folder ID (last segment after `/folders/`) and list all files — no date filter, full historical sweep. Deduplicate across folders by file ID. If `MEETING_FILTER` is set, only process files whose names contain that string.
 
-2. `DRIVE_FOLDER` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
+2. `DRIVE_FOLDERS` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
 
 3. Both empty: ask:
    > "No Drive source configured for [sow]. Paste either:
@@ -298,7 +297,7 @@ generated_by: /bootstrap
 sows_processed: [list]
 ---
 
-# Project Context — PROJECT_NAME
+# Project Context — {{CLIENT_NAME}}
 
 ## What this engagement is
 (1-2 sentences from SOW docs + meetings + Slack — what is Loka actually doing?)

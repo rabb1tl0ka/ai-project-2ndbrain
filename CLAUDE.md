@@ -1,41 +1,192 @@
-# Project Brain — Repo Onboarding
+# {{CLIENT_NAME}} — Engagement Brain
 
-You are helping someone set up an AI-powered project 2nd brain for a client engagement.
+## Setup (read this first)
 
-## What this repo is
+This is an AI-powered engagement brain for a Loka client project. It's built around how Loka engagements actually run: SOWs, working sessions, stakeholders, TLUs, and a roadmap.
 
-A ready-to-use project knowledge system. Clone it, fill in a config file, run setup, and have a working project brain that Claude understands from day one. Structured the way a TPM thinks — so even if you're an ML lead, a Tech Lead, or a shadowing engineer, the brain helps you work like a TPM would: tracking stakeholders, managing SOWs, running working sessions, and generating status updates.
+**If this brain hasn't been set up yet**, run `/onboard` — it collects client name, owner info, and SOW list, then replaces placeholders and creates your SOW directories.
 
-## Key files
+**If onboarding is done but bootstrap hasn't run**, run `/bootstrap` — it pulls SOW docs, meeting notes, Slack history, and Notion context into the vault.
+
+**Key files:**
 
 | File | Purpose |
 |------|---------|
-| `README.md` | Full setup instructions — read this first |
-| `project.config.example.yaml` | Config reference |
-| `project.config.yaml` | Your project config — gitignored, never committed |
-| `.claude/commands/onboard.md` | `/onboard` — guided setup, run from the repo root |
-| `project-vault/` | The actual project brain — open in Obsidian or any markdown editor |
+| `README.md` | Full setup instructions |
+| `config.example.yaml` | Config reference (3 fields) |
+| `config.yaml` | Your engagement config — gitignored, never committed |
+| `.claude/commands/onboard.md` | `/onboard` — guided setup |
+| `.claude/commands/bootstrap.md` | `/bootstrap` — load data into the brain |
 
-## How to help a new user
-
-When someone says "help me get started" or "read the README":
-
-1. Read `README.md` in full
-2. Walk them through setup conversationally
-3. Tell them to run `/onboard` — it asks each config field, writes `project.config.yaml`, replaces placeholders, and creates the first SOW
-4. Once onboarding is done, tell them to `cd project-vault && claude` and run `/bootstrap`
-5. Point them to `project-vault/CLAUDE.md` to understand how to work inside the brain
-
-## Common questions
-
-- **"What is this?"** — A project knowledge system built around how Loka engagements actually run: SOWs, working sessions, stakeholders, TLUs, and a roadmap. Claude understands the structure.
-- **"Do I need Obsidian?"** — No. Any markdown editor works. Obsidian is recommended.
-- **"I'm not a TPM — is this for me?"** — Yes. The structure instills TPM habits (stakeholder tracking, SOW organization, status updates) without requiring TPM experience. Fill in what you know, Claude handles the rest.
-- **"After onboarding, what do I do?"** — Run `/bootstrap` from inside `project-vault/`. It loads the SOW, meeting notes, and Slack history into the vault.
+**Common questions:**
 - **"What's `.kernel/`?"** — Internal repo tooling for the maintainer. Ignore it.
+- **"Do I need Obsidian?"** — No. Any markdown editor works. Obsidian is recommended.
+- **"I'm not a TPM — is this for me?"** — Yes. The structure instills TPM habits without requiring TPM experience.
 
-## What you should NOT do
+---
 
-- Don't help with vault content here — that happens inside `project-vault/` with its own Claude session
-- Don't suggest editing `project-vault/` before running setup — placeholders need to be replaced first
-- Don't expose `.kernel/` internals unless explicitly asked
+## Session Start
+
+Run `git pull` before starting any session to make sure you're on the latest version.
+
+If this is the very first session and the vault hasn't been loaded yet, run `/bootstrap` — it pulls the SOW, meeting notes, and Slack history into the vault so Claude has real project context from the start.
+
+## Who are you?
+
+At the start of each session, check whether the user has identified themselves (name and role). Look for this in their global `~/.claude/CLAUDE.md` or anything they've said in the current conversation.
+
+If you don't have that information yet, ask once — briefly:
+
+> "Before we start — who are you and what's your role on this project? (e.g. TPM, ML Lead, Tech Lead, shadowing) This helps me tailor my answers to how you actually work."
+
+If they decline, proceed with answers useful to anyone on a project team. Never ask again.
+
+If they identify themselves, use that context throughout the session:
+- **TPM**: scope, stakeholder dynamics, deliverable status, blockers, client comms
+- **ML Lead / Tech Lead**: architecture decisions, implementation depth, technical tradeoffs
+- **Sales Lead**: executive frame, risks and status, no jargon
+- **Shadowing**: explain the "why" behind things, not just the "what"
+
+---
+
+## About This Engagement
+
+**Client**: {{CLIENT_NAME}}
+**Engagement owner**: {{OWNER_NAME}} ({{OWNER_ROLE}})
+
+---
+
+## Vault Structure
+
+| Directory | Purpose | Lifecycle |
+|-----------|---------|-----------|
+| `inbox/` | Raw captures — meeting notes, ideas, voice transcripts | Gets processed and moved out |
+| `sows/` | One directory per SOW — work, meetings, deliverables | Per-SOW lifecycle |
+| `stakeholders/` | Client stakeholder profiles | Reference |
+| `team/` | Loka team member profiles | Reference |
+| `roadmap/` | Challenges, ideas, and features for this engagement | Maintained by Claude |
+| `notes/` | Project-level thinking and context | Evergreen |
+| `archive/` | Processed inbox items worth keeping | Done |
+| `templates/` | Working session, meeting summary, TLU templates | Reference |
+
+---
+
+## SOW Structure
+
+Each SOW lives at `sows/<sow-name>/`:
+
+| Path | Purpose |
+|------|---------|
+| `<sow-name>-reference.md` | What this SOW is — scope, deliverables, key dates |
+| `work/` | Working sessions (open-ended, slug-based) |
+| `meeting-summaries/` | Dated meeting notes |
+| `deliverables/` | Final deliverable artifacts |
+
+To add a new SOW: copy `sows/_template/` and rename it to the SOW name.
+
+---
+
+## Working Sessions
+
+Working sessions are focused work artifacts inside a SOW. They're slug-based and open-ended — use them for any topic that needs sustained focus.
+
+**When the user says "I need to work on [topic]" or "let's work on [topic]":**
+
+1. Convert the topic to a kebab-case slug (e.g. "pre kickoff" → `pre-kickoff`)
+2. Identify which SOW this belongs to — ask if unclear
+3. Create `sows/<sow-name>/work/<slug>/`
+4. Create `sows/<sow-name>/work/<slug>/<slug>.md` with this structure:
+
+```markdown
+---
+status: in-progress
+sow: <sow-name>
+---
+
+# <Title>
+
+## What this is
+(one sentence — what are we actually working on here)
+
+## What I need to figure out
+-
+
+## What I already know
+-
+
+## Notes
+```
+
+5. Confirm what was created, open the file for discussion
+6. Update the `## Active Working Sessions` block in the relevant SOW's reference file
+
+When a session is done: set `status: done` in frontmatter, remove from the active sessions block. Directory stays in `work/` — do not move it.
+
+Do NOT ask for confirmation before creating — just do it.
+
+---
+
+## TLUs (Traffic Light Updates)
+
+TLUs are weekly status updates — typically for the Sales Lead or engagement sponsor. Template: `templates/tlu.md`.
+
+**Convention:**
+- Generated weekly, covering the previous week
+- Output: `sows/<sow-name>/TLUs/YYYY-MM-DD-tlu.md` (date = Monday of that week)
+- Status color: 🟢 Green (on track), 🟡 Yellow (at-risk items or open blockers), 🔴 Red (engagement in jeopardy)
+- Audience: executive frame — risks, status, CTAs. No implementation jargon.
+
+**When the user says "generate a TLU" or "generate this week's TLU":**
+1. Read all meeting summaries, working session notes, and the SOW reference for current deliverables and blockers
+2. Fill the template — achievements, blockers (with CTAs + due dates), risks (with mitigations), key notes
+3. Save to the TLUs directory for that SOW
+
+---
+
+## Stakeholder & Team Profiles
+
+**Stakeholders** (client-side): `stakeholders/<name>/profile.md`
+**Team** (Loka-side): `team/<name>/profile.md`
+
+When the user references a known stakeholder or team member by name, read their profile and use that context to tailor your answer — communication style, technical depth, concerns, what motivates them.
+
+When logging a meeting or interaction, look up who was in the room and let their profiles inform the summary.
+
+---
+
+## Meeting Summaries
+
+Meeting notes for this project live in Google Drive as Gemini notes. Filenames follow this convention:
+`{meeting title} - {YYYY/MM/DD HH:MM TZ} - Notes by Gemini`
+
+Each SOW has its own Drive folder and Slack channels, configured in `sows/<sow>/sow.config.yaml`.
+
+Use `/bootstrap` once to load all historical meetings into the vault. After that, use `/meeting-recap` for new meetings as they happen — it picks up only what's changed since the last run.
+
+To manually log a meeting (e.g. from a paste or a file you already have open):
+1. Identify the SOW
+2. Use `templates/meeting-summary.md`
+3. Save to `sows/<sow-name>/meeting-summaries/YYYY-MM-DD-<slug>.md`
+
+---
+
+## Inbox Processing
+
+When the user says "process my inbox":
+1. Read each item in `inbox/`
+2. Route to the right place: working session note, meeting summary, stakeholder log, roadmap idea, or `notes/`
+3. Move processed items to `archive/` or their destination
+4. Never delete without asking
+
+---
+
+## Key Behaviors (Always Active)
+
+- **SOW-first thinking**: when the user describes work, connect it to a SOW. If it doesn't fit any active SOW, note that — it may be scope creep or a new engagement.
+- **Stakeholder awareness**: when a client stakeholder is mentioned, reference their profile if it exists. Flag if a profile is missing and offer to create one.
+- **Blockers surface up**: when you see a blocker in a working session or meeting note, flag it as TLU material.
+- **Don't bury the lede**: if you spot a risk or a decision that needs to be made, say it plainly. Don't soften it.
+
+---
+
+@roadmap/CLAUDE.md

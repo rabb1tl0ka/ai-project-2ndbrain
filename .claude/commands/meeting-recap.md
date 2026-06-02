@@ -2,22 +2,19 @@ Process Gemini meeting notes from Google Drive into structured meeting summaries
 
 ## Pre-flight
 
-1. Read `../project.config.yaml` (one level up from the vault). Extract `PROJECT_NAME`. If the file doesn't exist or `PROJECT_NAME` is still the literal `{{PROJECT_NAME}}`, stop:
-   > "Onboarding hasn't been run yet. Run `/onboard` from the repo root first, then try again."
-
-2. Determine which SOW to recap meetings for:
+1. Determine which SOW to recap meetings for:
    - Scan `sows/` for subdirectories excluding `_template`.
    - If only one SOW exists, use it.
    - If multiple SOWs exist, ask: "Which SOW are you recapping meetings for? [list options]"
 
-3. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDER`. If it's empty, ask:
-   > "No Drive folder configured for [sow]. Paste the Google Drive folder URL for the meeting notes."
+2. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `MEETING_FILTER`. If `DRIVE_FOLDERS` is empty, ask:
+   > "No Drive folder configured for [sow]. Paste one or more Google Drive folder URLs (comma-separated) for the meeting notes."
 
 ## Configuration
 
-- **Project filter**: PROJECT_NAME (read from `../project.config.yaml`)
-- **Drive folder**: DRIVE_FOLDER (read from `sows/<sow>/sow.config.yaml`)
-- **State file**: `.meeting-recap-state.md` (vault root)
+- **Drive folder**: DRIVE_FOLDERS (read from `sows/<sow>/sow.config.yaml`)
+- **Meeting filter**: MEETING_FILTER (read from `sows/<sow>/sow.config.yaml` — optional, applied when set)
+- **State file**: `.meeting-recap-state.md` (repo root)
 - **Summary template**: `templates/meeting-summary.md`
 
 ## Gemini filename convention
@@ -33,10 +30,10 @@ Example: `CS GCP Cost Optimization - 2026/05/28 14:22 WEST - Notes by Gemini`
 ### Default — `/meeting-recap`
 
 1. Read `.meeting-recap-state.md` for `last_ran`. If missing or empty, default to 7 days ago.
-2. Extract the Drive folder ID from the configured URL (last path segment after `/folders/`).
-3. Search the folder for files whose names contain PROJECT_NAME and were modified after `last_ran`.
+2. Parse `DRIVE_FOLDERS` as comma-separated URLs. For each folder, extract the folder ID (last segment after `/folders/`).
+3. Search each folder for files modified after `last_ran`. Deduplicate across folders by file ID. If `MEETING_FILTER` is set, only include files whose names contain that string.
 4. Process each match (see **Processing** below).
-5. Report: "Processed N meetings. Found M other meetings in that period that didn't match PROJECT_NAME — use `--keywords` to check them."
+5. Report: "Processed N meetings since <last_ran>." If MEETING_FILTER was applied, note it: "(filtered by '<MEETING_FILTER>')"
 6. Update `last_ran` in `.meeting-recap-state.md` to today's date.
 
 ### Keywords — `/meeting-recap --keywords {words}`
@@ -48,7 +45,7 @@ Example: `CS GCP Cost Optimization - 2026/05/28 14:22 WEST - Notes by Gemini`
 
 ### Date — `/meeting-recap --date {date}`
 
-1. Search the folder for all files modified on that specific date (no project name filter).
+1. Search the folder for all files modified on that specific date.
 2. Present the list and ask which ones to process.
 3. Process selected matches.
 4. **Do NOT update `last_ran`.**

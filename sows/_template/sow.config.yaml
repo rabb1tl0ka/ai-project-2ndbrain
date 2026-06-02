@@ -1,0 +1,38 @@
+# SOW Configuration
+# Created by /onboard — edit directly to update.
+# This file is committed to the repo so the whole team shares it.
+
+# What type of engagement this SOW is (e.g. "GenAI Assessment", "POC", "Staff Augmentation")
+ENGAGEMENT_TYPE: ""
+
+# 1-2 sentences describing what Loka is building or delivering for this client under this SOW
+ENGAGEMENT_CONTEXT: ""
+
+
+# Google Drive folder URL(s) containing Gemini meeting notes for this SOW
+# Comma-separated — add multiple folders if client and internal notes live in separate places
+# Example: "https://drive.google.com/drive/folders/abc, https://drive.google.com/drive/folders/xyz"
+DRIVE_FOLDERS: ""
+
+# Filename filter for meeting notes (optional but required when any DRIVE_FOLDERS entry is a shared
+# folder like My Drive > Meet Recordings rather than a SOW-specific folder).
+# Only files whose names contain this string will be processed across all folders.
+# Example: "ZenQMS", "ZenQMS SOW4", "CS " (note trailing space to avoid matching "CSS")
+MEETING_FILTER: ""
+
+# Direct URL to the SOW / Scope of Work document in Google Drive (optional)
+# If empty, /bootstrap will search DRIVE_FOLDERS for files named "SOW", "Scope of Work", or "Implementation Proposal"
+SOW_DOC_URL: ""
+
+# Slack channel(s) for this SOW — comma-separated, include the # prefix
+# Example: "#client-sow7-general, #client-sow7-dev"
+SLACK_CHANNELS: ""
+
+# (Optional) Comma-separated Gemini note doc URLs
+# Use when notes aren't all in one folder, or you want to point to specific docs directly
+GEMINI_NOTES_DOCS: ""
+
+# (Optional) Notion project page URL for this SOW
+# Used by /publish-to-notion (write) and /bootstrap (read)
+# Open the Notion page and paste the URL
+NOTION_PROJECT_URL: ""
