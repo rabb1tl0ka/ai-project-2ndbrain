@@ -128,6 +128,9 @@ copy_dir "templates"
 # Upgrade script itself (so users always have the latest upgrader)
 copy_file ".kernel/upgrade.sh"
 
+# .gitignore (ensures config.yaml and other sensitive files stay untracked)
+copy_file ".gitignore"
+
 # Version stamp
 mkdir -p "$TARGET/.kernel"
 echo "$CURRENT_TAG" > "$VERSION_FILE"
@@ -145,6 +148,7 @@ STAGED_PATHS=(
     "templates/"
     ".kernel/.2ndbrain-version"
     ".kernel/upgrade.sh"
+    ".gitignore"
 )
 
 if [ "$CREATE_PR" = true ]; then
