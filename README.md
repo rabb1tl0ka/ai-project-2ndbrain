@@ -1,6 +1,6 @@
 # AI Project 2nd Brain
 
-A Claude-powered engagement knowledge system for Loka projects. Fork it, configure it in 2 minutes, and have a working brain that Claude understands from day one.
+A Claude-powered engagement knowledge system for Loka projects. Create a repo from this template, configure it in 2 minutes, and have a working brain that Claude understands from day one.
 
 Structured the way a TPM thinks — so whether you're an ML Lead, Tech Lead, or shadowing engineer, the brain helps you work like a TPM would: tracking stakeholders, organizing by SOW, running working sessions, and generating TLUs.
 
@@ -21,12 +21,18 @@ config.yaml          ← your engagement config, gitignored — never committed
 
 ## Setup
 
-**1. Fork and clone**
+> **Are you the engagement owner setting this up for the first time, or a contributor joining an existing brain?**
+> - **Owner:** follow steps 1–6 below
+> - **Contributor:** skip to [Joining an existing brain](#joining-an-existing-brain)
 
-Fork this repo on GitHub (one fork per engagement), then clone your fork:
+**1. Create a repo from this template**
+
+On GitHub, click **Use this template → Create a new repository** (one repo per engagement). Name it `<client>-ai-2ndbrain` and set visibility to private.
+
+Then clone your new repo:
 ```bash
-git clone https://github.com/<your-org>/<your-project>-ai-2ndbrain
-cd <your-project>-ai-2ndbrain
+git clone https://github.com/<your-org>/<client>-ai-2ndbrain
+cd <client>-ai-2ndbrain
 ```
 
 **2. Run /onboard**
@@ -124,6 +130,46 @@ All commands run from the repo root in a Claude Code session (`claude`).
 **Track a stakeholder** → copy `stakeholders/_example/`, fill in `profile.md`
 
 **Log a meeting** → ask Claude: *"log this meeting summary"* — saves to the right SOW
+
+## Joining an existing brain
+
+Someone already created and configured the repo. You just need to clone it and set up your local config.
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/<your-org>/<client>-ai-2ndbrain
+cd <client>-ai-2ndbrain
+```
+
+**2. Create your `config.yaml`**
+
+Copy the example and fill in your name and role:
+```bash
+cp config.example.yaml config.yaml
+```
+
+`config.yaml` is gitignored — it never gets committed.
+
+**3. Create your SOW branch**
+
+Ask the engagement owner which SOW you're contributing to, then:
+```bash
+git checkout -b sow1/yourname   # contributor to an existing SOW
+git push -u origin sow1/yourname
+```
+
+If you're the lead on your own SOW:
+```bash
+git checkout -b sow2
+git push -u origin sow2
+```
+
+**4. Orient yourself**
+```
+/2ndbrain
+```
+
+---
 
 ## Multi-contributor workflow
 
