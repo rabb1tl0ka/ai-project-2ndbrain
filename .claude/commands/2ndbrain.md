@@ -65,6 +65,16 @@ Next: run /bootstrap
 Read `.bootstrap-state.md` for `last_ran` and `sows_processed`.
 Read `config.yaml` for `CLIENT_NAME`, `OWNER_NAME`, `OWNER_ROLE`.
 
+**Version check (silent on failure):**
+
+Read `.kernel/.2ndbrain-version` for the current version. Then run:
+```bash
+git ls-remote --tags https://github.com/rabb1tl0ka/ai-project-2ndbrain 2>/dev/null \
+  | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -V | tail -1 | grep -o 'v.*'
+```
+If this fails for any reason (no network, timeout), skip silently — do not block the output.
+Compare the latest tag to the current version. Store result as `UPDATE_AVAILABLE` (true/false).
+
 **Per-SOW details:**
 
 For each SOW directory in `sows/` (excluding `_template`), in order:
@@ -97,6 +107,13 @@ SOWs:
   (repeat for each SOW)
 
 Next: /meeting-recap to pick up new meetings.
+```
+
+If `UPDATE_AVAILABLE` is true, append:
+
+```
+⚠  Update available: <current_version> → <latest_version>
+   Run /upgrade to see what changed, /upgrade --apply to update.
 ```
 
 ---
