@@ -110,6 +110,7 @@ copy_file ".claude/commands/bootstrap.md"
 copy_file ".claude/commands/meeting-recap.md"
 copy_file ".claude/commands/publish-to-notion.md"
 copy_file ".claude/commands/fetch-from-notion.md"
+copy_file ".claude/commands/upgrade.md"
 
 # Config reference (never the actual config.yaml — that's gitignored user data)
 copy_file "config.example.yaml"
@@ -127,6 +128,9 @@ copy_dir "templates"
 # Roadmap conventions and item templates
 copy_file "roadmap/CLAUDE.md"
 copy_dir "roadmap/templates"
+
+# Upgrade script itself (so users always have the latest upgrader)
+copy_file ".kernel/upgrade.sh"
 
 # Version stamp
 mkdir -p "$TARGET/.kernel"
@@ -146,6 +150,7 @@ STAGED_PATHS=(
     "roadmap/CLAUDE.md"
     "roadmap/templates/"
     ".kernel/.2ndbrain-version"
+    ".kernel/upgrade.sh"
 )
 
 if [ "$CREATE_PR" = true ]; then
