@@ -12,7 +12,6 @@ sows/                ← one directory per SOW
   _template/         ← copy this to create a new SOW
 stakeholders/        ← client stakeholder profiles
 team/                ← Loka team member profiles
-roadmap/             ← challenges, ideas, features for this engagement
 notes/               ← project-level thinking and context
 archive/             ← processed inbox items worth keeping
 templates/           ← working session, meeting summary, TLU templates
@@ -58,12 +57,18 @@ This pulls in the SOW document, all historical meeting notes from Google Drive, 
 
 Open `notes/project-context.md` — that's your ground truth. Fill in team profiles in `team/`, enrich stakeholder profiles in `stakeholders/`, and address any tensions flagged by bootstrap.
 
-**5. Commit and push**
+**5. Create your SOW branch and push**
+
+Main is protected — don't push directly to it. Each SOW lead owns a dedicated branch:
 
 ```bash
+git checkout -b sow1          # if you're the SOW lead
+git checkout -b sow1/yourname # if you're a contributor to someone else's SOW
 git add -A && git commit -m "init: configure engagement brain"
-git push
+git push -u origin HEAD
 ```
+
+See [Multi-contributor workflow](#multi-contributor-workflow) below for the full collaboration model.
 
 **6. Orient yourself anytime**
 
@@ -120,7 +125,27 @@ All commands run from the repo root in a Claude Code session (`claude`).
 
 **Log a meeting** → ask Claude: *"log this meeting summary"* — saves to the right SOW
 
-**Track an idea or challenge** → ask Claude: *"save this as an idea"* — goes to `roadmap/`
+## Multi-contributor workflow
+
+Multiple PMs or leads can share the same brain repo — each owning a different SOW — without stepping on each other.
+
+**Branch model:**
+- `main` is protected — requires a PR and one approval to merge
+- Each SOW lead owns a long-lived branch: `sow1`, `sow2`, etc.
+- Team members contributing to a SOW branch off it: `sow1/alice`, `sow1/james`
+
+**Day-to-day:**
+- Work freely on your SOW branch — commit and push anytime, no PR needed
+- Pull `main` into your branch regularly to pick up the other lead's updates: `git merge main`
+- Open a PR from your SOW branch → `main` weekly (end of week, before a TLU, at a milestone)
+
+**The weekly PR is more than a merge** — the diff is markdown: meeting summaries, stakeholder notes, TLU drafts. It tells the story of your week. The other lead approves in seconds and immediately sees what you've been working on, who you met with, and what's blocked. No extra syncs needed.
+
+**If a push to main gets rejected by GitHub**, that's expected — Claude will set up your SOW branch for you.
+
+**GitHub setup** (repo owner, one-time):
+1. Give all contributors **Write** access (not Admin)
+2. Protect `main`: require 1 PR approval, allow any collaborator to approve
 
 ## Notion channel
 
