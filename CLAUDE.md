@@ -19,7 +19,7 @@ This is an AI-powered engagement brain for a Loka client project. It's built aro
 | `.claude/commands/bootstrap.md` | `/bootstrap` — load data into the brain |
 
 **Common questions:**
-- **"What's `.kernel/`?"** — Internal repo tooling for the maintainer. Ignore it.
+- **"What's `.kernel/`?"** — Internal repo tooling for the template maintainer. Contains the template's own roadmap (`.kernel/roadmap/`) for improvements to the brain itself — not the client engagement. Ignore it unless you're Bruno working on the template.
 - **"Do I need Obsidian?"** — No. Any markdown editor works. Obsidian is recommended.
 - **"I'm not a TPM — is this for me?"** — Yes. The structure instills TPM habits without requiring TPM experience.
 
@@ -53,7 +53,9 @@ Then:
 2. Push it: `git push -u origin <sow>/<name>`
 3. Explain they work here freely and open a PR to main when ready
 
-**Why this model:** SOW directories are non-overlapping so merge conflicts are rare. PRs to main are about visibility and shared history, not gatekeeping. Any contributor with Write access can approve.
+**Why this model:** SOW directories are non-overlapping so merge conflicts are rare. PRs to main are not code reviews — they're lightweight async status updates. The diff is markdown: meeting summaries, TLU drafts, stakeholder notes. It tells a story. The other lead sees exactly who you met with, what's blocked, what the client is worried about — without a single Slack message or sync meeting.
+
+Treat the weekly PR as a ritual: open it Friday, write two sentences in the description summarizing the week. The diff does the heavy lifting. When Claude is helping you commit and push, it should suggest opening the PR to main if it's been more than a week since the last one.
 
 **If the user is the repo owner** and gets a protection error: use a PR like anyone else, or bypass protection in GitHub settings for an emergency direct push.
 
@@ -92,7 +94,6 @@ If they identify themselves, use that context throughout the session:
 | `sows/` | One directory per SOW — work, meetings, deliverables | Per-SOW lifecycle |
 | `stakeholders/` | Client stakeholder profiles | Reference |
 | `team/` | Loka team member profiles | Reference |
-| `roadmap/` | Challenges, ideas, and features for this engagement | Maintained by Claude |
 | `notes/` | Project-level thinking and context | Evergreen |
 | `archive/` | Processed inbox items worth keeping | Done |
 | `templates/` | Working session, meeting summary, TLU templates | Reference |
@@ -214,7 +215,3 @@ When the user says "process my inbox":
 - **Stakeholder awareness**: when a client stakeholder is mentioned, reference their profile if it exists. Flag if a profile is missing and offer to create one.
 - **Blockers surface up**: when you see a blocker in a working session or meeting note, flag it as TLU material.
 - **Don't bury the lede**: if you spot a risk or a decision that needs to be made, say it plainly. Don't soften it.
-
----
-
-@roadmap/CLAUDE.md
