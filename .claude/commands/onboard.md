@@ -111,17 +111,22 @@ If `sows/<sow>` already exists, skip the copy and note it.
    > Open the folder in Drive and paste the URL.
    > (e.g. `https://drive.google.com/drive/folders/abc123`)"
 
-4. **SOW_DOC_URL** (optional)
+4. **MEETING_FILTER** (optional — only needed if DRIVE_FOLDER is a shared folder like Meet Recordings)
+   > "Is this a SOW-specific folder, or a shared folder like Meet Recordings?
+   > If shared, paste the string that identifies this project's meetings in the filename.
+   > (e.g. `ZenQMS`, `ZenQMS SOW4`, `CS `) — press enter to skip if the folder is already SOW-specific."
+
+6. **SOW_DOC_URL** (optional)
    > "Direct link to the SOW / Scope of Work document in Google Drive.
    > If you skip this, /bootstrap will search the Drive folder automatically.
    > Press enter to skip."
 
-5. **SLACK_CHANNELS** (optional)
+7. **SLACK_CHANNELS** (optional)
    > "Slack channel(s) for [sow], comma-separated with # prefix.
    > (e.g. `#client-sow1-general, #client-sow1-dev`)
    > Press enter to skip."
 
-6. **GEMINI_NOTES_DOCS** (optional)
+8. **GEMINI_NOTES_DOCS** (optional)
    > "Specific Gemini note doc URLs for [sow], comma-separated.
    > Only needed if notes aren't all in one folder.
    > Press enter to skip."
@@ -135,6 +140,7 @@ If `sows/<sow>` already exists, skip the copy and note it.
 ENGAGEMENT_TYPE: "<value or empty>"
 ENGAGEMENT_CONTEXT: "<value or empty>"
 DRIVE_FOLDER: "<value or empty>"
+MEETING_FILTER: "<value or empty>"
 SOW_DOC_URL: "<value or empty>"
 SLACK_CHANNELS: "<value or empty>"
 GEMINI_NOTES_DOCS: "<value or empty>"

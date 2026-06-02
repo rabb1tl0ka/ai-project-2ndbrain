@@ -13,6 +13,12 @@ ENGAGEMENT_CONTEXT: ""
 # Open the folder in Drive and paste the URL
 DRIVE_FOLDER: ""
 
+# Filename filter for meeting notes (optional but required when DRIVE_FOLDER is a shared folder
+# like My Drive > Meet Recordings rather than a SOW-specific folder).
+# Only files whose names contain this string will be processed.
+# Example: "ZenQMS", "ZenQMS SOW4", "CS " (note trailing space to avoid matching "CSS")
+MEETING_FILTER: ""
+
 # Direct URL to the SOW / Scope of Work document in Google Drive (optional)
 # If empty, /bootstrap will search DRIVE_FOLDER for files named "SOW", "Scope of Work", or "Implementation Proposal"
 SOW_DOC_URL: ""

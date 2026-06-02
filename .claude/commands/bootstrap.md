@@ -69,6 +69,7 @@ Process every discovered SOW in order. For each `<sow>`:
 
 Read `sows/<sow>/sow.config.yaml`. Extract:
 - `DRIVE_FOLDER`
+- `MEETING_FILTER`
 - `SOW_DOC_URL`
 - `SLACK_CHANNELS`
 - `GEMINI_NOTES_DOCS`
@@ -125,7 +126,7 @@ If it still has template placeholders, replace with extracted content. If it alr
 
 Priority order:
 
-1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), list ALL files in the folder — no date filter, full historical sweep.
+1. `DRIVE_FOLDER` is set: extract the folder ID (last segment after `/folders/`), list all files in the folder — no date filter, full historical sweep. If `MEETING_FILTER` is set, only process files whose names contain that string.
 
 2. `DRIVE_FOLDER` is empty but `GEMINI_NOTES_DOCS` is set: parse as comma-separated doc URLs, extract each doc ID (segment after `/d/`, before `/edit` or `?`).
 
