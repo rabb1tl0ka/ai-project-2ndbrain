@@ -120,7 +120,7 @@ Each SOW lives at `sows/<sow-name>/`:
 | `work/` | Working sessions — slug-based, open-ended |
 | `meeting-summaries/` | Dated meeting notes |
 | `deliverables/` | Final deliverable artifacts |
-| `sow.config.yaml` | Drive folder, Slack channels, Notion URL, engagement type/context |
+| `sow.config.yaml` | Drive folder, meeting filter, Slack channels, Notion URL, engagement type/context |
 
 To start a new SOW: copy `sows/_template/` and rename it. Or run `/bootstrap --sow <name>`.
 
