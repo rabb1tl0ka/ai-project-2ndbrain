@@ -141,12 +141,9 @@ git clone https://github.com/<your-org>/<client>-ai-2ndbrain
 cd <client>-ai-2ndbrain
 ```
 
-**2. Create your `config.yaml`**
+**2. Run `/onboard`**
 
-Copy the example and fill in your name and role:
-```bash
-cp config.example.yaml config.yaml
-```
+This sets up your local `config.yaml` (name, role) and any SOW directories you're contributing to. It detects the existing engagement config and only asks for what's missing.
 
 `config.yaml` is gitignored — it never gets committed.
 
@@ -177,8 +174,7 @@ Multiple PMs or leads can share the same brain repo — each owning a different 
 
 **Branch model:**
 - `main` is protected — requires a PR and one approval to merge
-- Each SOW lead owns a long-lived branch: `sow1`, `sow2`, etc.
-- Team members contributing to a SOW branch off it: `sow1/alice`, `sow1/james`
+- Each SOW lead owns a long-lived branch: `sow1`, `sow2`, etc. Everyone working on that SOW uses the same branch.
 
 **Day-to-day:**
 - Work freely on your SOW branch — commit and push anytime, no PR needed

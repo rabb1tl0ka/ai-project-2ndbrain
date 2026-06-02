@@ -332,16 +332,32 @@ Check for across all SOWs:
 
 ## Wrap up
 
-1. Update `.meeting-recap-state.md` `last_ran` to today — future `/meeting-recap` runs only pick up new meetings.
+1. **Create SOW branch(es) if missing.**
 
-2. Update `.bootstrap-state.md`:
+   For each SOW that was processed, check whether a remote branch exists:
+   ```bash
+   git ls-remote --heads origin <sow>
+   ```
+   If the branch doesn't exist locally or remotely, create and push it:
+   ```bash
+   git checkout -b <sow>
+   git push -u origin <sow>
+   git checkout -
+   ```
+   If it already exists, skip silently.
+
+   This is the branch everyone on this SOW works from — no PRs needed for day-to-day commits. PRs only go from `<sow>` → `main`.
+
+2. Update `.meeting-recap-state.md` `last_ran` to today — future `/meeting-recap` runs only pick up new meetings.
+
+3. Update `.bootstrap-state.md`:
 
 ```
 last_ran: YYYY-MM-DD
 sows_processed: <comma-separated list>
 ```
 
-3. Print:
+4. Print:
 
 ```
 Bootstrap complete.
@@ -351,6 +367,7 @@ Bootstrap complete.
 ✓  [sow] N meetings     → sows/<sow>/meeting-summaries/
 ✓  [sow] Slack context  → sows/<sow>/slack-context.md
 ✓  [sow] Notion context → sows/<sow>/notion-context.md  (or "skipped — not configured")
+✓  [sow] branch        → origin/<sow>  (or "already existed")
 
 ✓  M stakeholder stubs → stakeholders/
 ✓  Context snapshot    → notes/project-context.md

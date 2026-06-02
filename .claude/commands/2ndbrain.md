@@ -87,6 +87,11 @@ For each SOW directory in `sows/` (excluding `_template`), in order:
 4. Check if `sows/<sow>/slack-context.md` exists.
 5. Read `SLACK_CHANNELS` from `sow.config.yaml` (empty string if not set).
 6. Read `NOTION_PROJECT_URL` from `sow.config.yaml` (empty string if not set).
+7. Check if the SOW branch exists on remote:
+   ```bash
+   git ls-remote --heads origin <sow>
+   ```
+   Store as `BRANCH_EXISTS` (true if output is non-empty, false otherwise).
 
 Print:
 
@@ -101,6 +106,7 @@ Owner:   <OWNER_NAME> (<OWNER_ROLE>)
 SOWs:
   • <sow> — <DESCRIPTION>
              <N> meeting summaries, slack context ✓/✗
+             Branch:  origin/<sow> ✓  (or "✗ — run /bootstrap --sow <sow> to create it")
              Slack:   <SLACK_CHANNELS or "(none configured)">
              Notion:  <NOTION_PROJECT_URL or "(none configured)">
 
