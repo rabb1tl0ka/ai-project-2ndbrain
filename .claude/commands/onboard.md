@@ -93,6 +93,7 @@ For each SOW in the list (in order):
 ```bash
 cp -r sows/_template sows/<sow>
 mv sows/<sow>/sow-reference.md sows/<sow>/<sow>-reference.md
+mv sows/<sow>/sow-tasks.md sows/<sow>/<sow>-tasks.md
 ```
 
 If `sows/<sow>` already exists, skip the copy and note it.
@@ -152,6 +153,11 @@ SOW_DOC_URL: "<value or empty>"
 SLACK_CHANNELS: "<value or empty>"
 GEMINI_NOTES_DOCS: "<value or empty>"
 sow_lead: "<value or empty>"
+```
+
+Replace `{{SOW_NAME}}` placeholder in the new SOW's files:
+```bash
+find sows/<sow> -name "*.md" -print0 | xargs -0 sed -i "s|{{SOW_NAME}}|<sow>|g"
 ```
 
 Report: "Configured sows/<sow>/."

@@ -31,6 +31,8 @@ Run `git pull` before starting any session to make sure you're on the latest ver
 
 If this is the very first session and the vault hasn't been loaded yet, run `/bootstrap` — it pulls the SOW, meeting notes, and Slack history into the vault so Claude has real project context from the start.
 
+For each SOW being worked on this session, read `sows/<sow>/CLAUDE.md` — it contains the task board rules and open task awareness for that SOW.
+
 ## Collaboration Model
 
 This repo may have multiple contributors (e.g. two TPMs, each owning a different SOW). Main is protected — direct pushes are rejected by GitHub.

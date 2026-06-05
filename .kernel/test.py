@@ -53,6 +53,7 @@ def test_repo_structure():
         "sows/_template/meeting-summaries",
         "sows/_template/deliverables",
         "sows/_template/work",
+        "sows/_template/done",
         ".claude/commands",
         ".kernel",
     ]
@@ -72,6 +73,8 @@ def test_repo_structure():
         "templates/working-session.md",
         "sows/_template/sow.config.yaml",
         "sows/_template/sow-reference.md",
+        "sows/_template/sow-tasks.md",
+        "sows/_template/CLAUDE.md",
         ".claude/commands/onboard.md",
         ".claude/commands/bootstrap.md",
         ".claude/commands/2ndbrain.md",
@@ -118,6 +121,61 @@ def test_config_example():
 
 
 # ─── sow.config.yaml template ─────────────────────────────────────────────────
+
+def test_sow_task_board():
+    section("SOW task board template files")
+    repo = Path(__file__).parent.parent
+
+    if (repo / "sows/_template/CLAUDE.md").is_file():
+        ok("sows/_template/CLAUDE.md exists")
+    else:
+        fail("sows/_template/CLAUDE.md exists")
+
+    if (repo / "sows/_template/sow-tasks.md").is_file():
+        ok("sows/_template/sow-tasks.md exists")
+    else:
+        fail("sows/_template/sow-tasks.md exists")
+
+    if (repo / "sows/_template/done/.gitkeep").is_file():
+        ok("sows/_template/done/.gitkeep exists")
+    else:
+        fail("sows/_template/done/.gitkeep exists")
+
+    tasks_content = (repo / "sows/_template/sow-tasks.md").read_text()
+    for col in ["ID", "Task", "Owner", "Priority", "Due", "Session", "Status", "Notes"]:
+        if col in tasks_content:
+            ok(f"sow-tasks.md has '{col}' column")
+        else:
+            fail(f"sow-tasks.md has '{col}' column")
+
+    claude_content = (repo / "sows/_template/CLAUDE.md").read_text()
+    if "{{SOW_NAME}}" in claude_content:
+        ok("sows/_template/CLAUDE.md has {{SOW_NAME}} placeholder")
+    else:
+        fail("sows/_template/CLAUDE.md has {{SOW_NAME}} placeholder")
+
+    if "priority" in claude_content.lower():
+        ok("sows/_template/CLAUDE.md references priority inference")
+    else:
+        fail("sows/_template/CLAUDE.md references priority inference")
+
+    onboard = (repo / ".claude/commands/onboard.md").read_text()
+    if "sow-tasks.md" in onboard and "<sow>-tasks.md" in onboard:
+        ok("/onboard renames sow-tasks.md → <sow>-tasks.md")
+    else:
+        fail("/onboard renames sow-tasks.md → <sow>-tasks.md")
+
+    if "{{SOW_NAME}}" in onboard and "sed" in onboard:
+        ok("/onboard replaces {{SOW_NAME}} placeholder")
+    else:
+        fail("/onboard replaces {{SOW_NAME}} placeholder")
+
+    root_claude = (repo / "CLAUDE.md").read_text()
+    if "sows/<sow>/CLAUDE.md" in root_claude:
+        ok("root CLAUDE.md references per-SOW CLAUDE.md")
+    else:
+        fail("root CLAUDE.md references per-SOW CLAUDE.md")
+
 
 def test_sow_config_template():
     section("sows/_template/sow.config.yaml")
@@ -299,6 +357,7 @@ def main():
     test_repo_structure()
     test_gitignore()
     test_config_example()
+    test_sow_task_board()
     test_sow_config_template()
     test_sow_config_parsing()
     test_sow_branch_naming()
