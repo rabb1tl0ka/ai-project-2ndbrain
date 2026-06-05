@@ -97,6 +97,11 @@ def test_gitignore():
     else:
         fail(".meeting-recap-state.md is gitignored")
 
+    if ".obsidian/" in content:
+        ok(".obsidian/ is gitignored")
+    else:
+        fail(".obsidian/ is gitignored")
+
 
 # ─── config.example.yaml ─────────────────────────────────────────────────────
 
