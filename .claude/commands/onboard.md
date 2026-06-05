@@ -180,9 +180,12 @@ Print:
 Then print a suggestion:
 ```
 💡 Consider protecting `<sow>` on GitHub to require PRs from team members
-   (Settings → Branches → Add ruleset). Keeps contributions visible and
-   avoids accidental direct pushes. Optional — skip if you're fine with
-   direct pushes from the lead.
+   (Settings → Branches → Add ruleset). Recommended setup:
+   - Require PRs to merge into `<sow>`
+   - Add yourself (<sow_lead>) as a bypass actor so you can push/merge
+     directly for chores without needing a reviewer
+   This keeps the team's contributions visible while not blocking you on
+   markdown updates and day-to-day maintenance.
 ```
 
 If the branch already exists:

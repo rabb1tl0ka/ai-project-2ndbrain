@@ -72,8 +72,18 @@ main                          ← PR from sow{N}, other SOW lead approves
 ```
 
 - **SOW lead** has merge authority on `sow{N}` and PRs `sow{N}` → `main`
+- **SOW lead** has bypass rights on their own `sow{N}` — can push/merge directly for chores and markdown (no reviewer needed)
 - **Team members** branch off `sow{N}/<name-or-slug>` and PR into `sow{N}`
 - GitHub rulesets enforce what needs enforcing — Claude handles guidance
+
+## GitHub ruleset setup
+
+| Branch | Require PR | Bypass for SOW lead |
+|--------|-----------|---------------------|
+| `main` | yes | no — everyone PRs, no exceptions |
+| `sow{N}` | yes | yes — SOW lead can push/merge directly |
+
+The protection that matters is `main`. SOW branch protection exists to give team members a review gate, not to block the lead on their own branch. Requiring a reviewer for markdown chores is friction with no payoff.
 
 ## How Claude uses `sow_lead`
 
