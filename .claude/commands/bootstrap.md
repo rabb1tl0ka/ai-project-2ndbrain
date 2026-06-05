@@ -39,12 +39,13 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
    mv sows/<name>/sow-reference.md sows/<name>/<name>-reference.md
    ```
 
-2. Ask for per-SOW config (press enter to skip optional fields):
+2. Ask for per-SOW config **one field at a time** — send each question as its own message and wait for the user's reply before asking the next. Do NOT list all questions at once.
 
-   - **DRIVE_FOLDERS** — "Google Drive folder URL(s) for <name> meeting notes — comma-separated if you have multiple. (Press enter to skip and fill in later.)"
-   - **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDERS automatically.)"
-   - **SLACK_CHANNELS** — "Slack channel(s) for <name>, comma-separated with # prefix. (Press enter to skip.)"
-   - **GEMINI_NOTES_DOCS** — "Specific Gemini note doc URLs for <name>, comma-separated. Only needed if notes aren't all in one folder. (Press enter to skip.)"
+   Ask in this order, one per message:
+   1. **DRIVE_FOLDERS** — "Google Drive folder URL(s) for <name> meeting notes — comma-separated if you have multiple. (Press enter to skip and fill in later.)"
+   2. **SOW_DOC_URL** — "Direct link to the SOW document for <name> in Google Drive. (Press enter to skip — I'll search DRIVE_FOLDERS automatically.)"
+   3. **SLACK_CHANNELS** — "Slack channel(s) for <name>, comma-separated with # prefix. (Press enter to skip.)"
+   4. **GEMINI_NOTES_DOCS** — "Specific Gemini note doc URLs for <name>, comma-separated. Only needed if notes aren't all in one folder. (Press enter to skip.)"
 
 3. Write `sows/<name>/sow.config.yaml`:
    ```yaml
