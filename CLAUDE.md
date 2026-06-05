@@ -42,7 +42,13 @@ Each PM owns a persistent branch tied to their SOW (e.g. `sow2/alice`). On that 
 - **Daily**: commit and push freely to your SOW branch
 - **Periodically**: PR from `<sow>/<name>` → main, lightweight approval, merge, pull
 
-To keep merges easy, pull main into the SOW branch regularly: `git merge main` or `git rebase main`. The longer the branch drifts, the harder the eventual merge.
+To keep merges easy, pull main into the SOW branch regularly using merge — never rebase:
+```bash
+git checkout sow3
+git merge origin/main
+git push
+```
+Rebase replays commits and causes conflicts when the same changes already landed in main via a different branch. Merge just fast-forwards. The longer the branch drifts from main, the harder the eventual PR.
 
 **For one-off changes** (not tied to a specific SOW): use a short-lived branch, open a PR when ready, merge and delete.
 
