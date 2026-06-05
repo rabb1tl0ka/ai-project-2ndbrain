@@ -1,121 +1,99 @@
 ---
-status: todo
+status: done
 priority: high
 owner: ""
 phase: ""
 depends_on: []
 ---
 
-# Feature: SOW Branch Config + Contributor Identity
+# Feature: SOW Branch Config + SOW Lead Identity
 
 ## One-Line Overview
-Bootstrap records the SOW lead per SOW in `sow.config.yaml` and each user's personal branch in gitignored `config.yaml`, so Claude always knows where to commit and `/2ndbrain` warns when setup is incomplete.
 
-## What's the idea
+`/onboard` asks who the SOW lead is, records it in `sow.config.yaml`, and creates the long-lived `sow{N}` branch on GitHub — so Claude always knows where to direct commits and the branch exists from day one.
 
-Each SOW has a designated lead — the person who pushes freely to that SOW's branch. Bootstrap asks who the lead is (once, when first setting up a SOW) and stores it in `sow.config.yaml`. Each user also records their own branch in their local gitignored `config.yaml`. On every session, Claude verifies the branch exists in git. `/2ndbrain` surfaces missing setup as a gap.
+## What it does
 
-### Branching model (two-tier)
+### 1. `/onboard` asks for the SOW lead
 
-```
-main
-├── sow3              ← Ronny (SOW3 lead) pushes freely here
-│   ├── sow3/sarah   ← Sarah PRs into sow3
-│   └── sow3/james   ← James PRs into sow3
-└── sow4              ← Bruno (SOW4 lead) pushes freely here
-    └── sow4/alice   ← Alice PRs into sow4
-```
+During SOW setup, `/onboard` asks:
+> "Who is the lead for this SOW? (the person responsible for delivery — e.g. `ronny`)"
 
-- **SOW lead** owns `sow{N}` — commits and pushes freely, no PR needed to the SOW branch
-- **Team members** branch off `sow{N}/<name>`, PR into `sow{N}`
-- **SOW leads** PR `sow{N}` → `main` periodically; the other SOW lead (or repo owner) approves
-
-### What defines the SOW lead
-
-The SOW lead is whoever is responsible for that SOW's delivery — not necessarily the repo owner. The repo owner may or may not be a SOW lead. Examples:
-
-| Person | Repo owner | SOW lead | Branch |
-|--------|-----------|----------|--------|
-| Bruno | yes | SOW4 | `sow4` |
-| Ronny | no | SOW3 | `sow3` |
-| Alice | no | neither | `sow4/alice` |
-
-The SOW lead is set once at bootstrap time and stored in `sow.config.yaml` (committed, shared). It is a property of the SOW, not of the user.
-
-### Storage: two files, two concerns
-
-**`sow.config.yaml`** (committed, per-SOW) — stores who the lead is:
+Normalize to lowercase. Write to `sow.config.yaml`:
 ```yaml
-sow_lead: ronny   # normalized lowercase
+sow_lead: ronny
 ```
 
-**`config.yaml`** (gitignored, per-user) — stores this user's branch:
-```yaml
-sow_branches:
-  sow3: sow3/ronny
-  sow4: sow4/bruno
+This is committed and shared — it's a property of the SOW, not of the user.
+
+### 2. Creates the long-lived `sow{N}` branch
+
+After writing `sow_lead`, `/onboard` creates the branch if it doesn't exist:
+```bash
+git checkout -b sow3
+git push -u origin sow3
+git checkout -
 ```
 
-### Branch naming rules
+Print explicit output to the user:
+```
+✓ Branch `sow3` created and pushed to origin.
+  Team members should branch off `sow3` and PR back into it.
+  You PR `sow3` → `main` periodically to sync with the rest of the engagement.
+```
 
-| Who | Branch |
-|-----|--------|
-| SOW lead (as recorded in `sow.config.yaml`) | `sow{N}` |
-| Anyone else | `sow{N}/<their-name>` |
+If the branch already exists, print:
+```
+✓ Branch `sow3` already exists on origin — skipped creation.
+```
 
-### Bootstrap changes
+### 3. Suggests branch protection (optional)
 
-**When setting up a SOW for the first time (no `sow_lead` in `sow.config.yaml`):**
+After branch creation, print a suggestion to the SOW lead:
+```
+💡 Consider protecting `sow3` on GitHub to require PRs from team members
+   (Settings → Branches → Add ruleset). This keeps contributions visible
+   and avoids accidental direct pushes. Totally optional — skip if you're
+   fine with direct pushes.
+```
 
-1. Ask: "Who is the lead for this SOW? (the person who owns delivery and will push freely to `sow{N}`)"
-2. Normalize to lowercase (`Ronny` → `ronny`)
-3. Write `sow_lead: ronny` to `sow.config.yaml` — this is committed and shared
+No enforcement. The lead decides.
 
-**Then, for the person running bootstrap:**
+## Branching model
 
-4. Ask: "Who are you? Enter your name. (e.g. `Bruno` — used to set up your personal branch)"
-5. Normalize to lowercase
-6. Compare against `sow_lead`: if match → their branch is `sow{N}`, otherwise `sow{N}/<name>`
-7. Write to `config.yaml` under `sow_branches`
-8. Create the branch automatically: `git checkout -b <branch> && git push -u origin <branch>`
+```
+main                          ← PR from sow{N}, other SOW lead approves
+└── sow3 (long-lived)         ← Ronny has merge authority, created by /onboard
+│   ├── sow3/alice-tlu-week3  ← short-lived, PR into sow3
+│   └── sow3/james-kickoff    ← short-lived, PR into sow3
+└── sow4 (long-lived)         ← Bruno has merge authority, created by /onboard
+    ├── sow4/bruno-chore-x    ← short-lived, PR into sow4
+    └── sow4/sarah-notes      ← short-lived, PR into sow4
+```
 
-**When a SOW already has a lead recorded** (someone else ran bootstrap first):
+- **SOW lead** has merge authority on `sow{N}` and PRs `sow{N}` → `main`
+- **Team members** branch off `sow{N}/<name-or-slug>` and PR into `sow{N}`
+- GitHub rulesets enforce what needs enforcing — Claude handles guidance
 
-- Skip the SOW lead question, show who the lead is
-- Go straight to "Who are you?" and derive the personal branch
+## How Claude uses `sow_lead`
 
-### Session start / `/2ndbrain` checks
+When anyone asks Claude "where do I commit this?", Claude reads `sow_lead` from `sow.config.yaml` and gives a concrete answer:
+> "Branch off `sow3` and open a PR into it. Ronny is the lead and will merge it."
 
-For each SOW directory found under `sows/`:
-- `sow.config.yaml` has no `sow_lead` → flag: "SOW lead not set — run `/bootstrap` for this SOW"
-- `config.yaml` has no entry for this SOW → flag: "your branch for `sow{N}` isn't configured — run `/bootstrap`"
-- Branch in `config.yaml` but not in git locally → warn: "branch `sow4/bruno` isn't in git — want me to create it?"
-- Everything present → silent pass
+No guessing, no wrong branch.
 
-## Expected advantages / benefits
+## What's out of scope
 
-- Claude always knows which branch to commit to — no accidental pushes to main
-- SOW lead is explicit and committed — no ambiguity about who owns the SOW branch
-- Team members have clear lanes (`sow4/alice` PRs into `sow4`)
-- `/2ndbrain` catches missing setup before it becomes a push-rejection surprise
-- Personal branch config is gitignored — no merge conflicts
-
-## Downsides / risks
-
-- Two questions added to bootstrap (SOW lead + personal name) — minor friction on first run
-- Two-tier PRs (team → SOW branch → main) adds overhead for very small teams; optional for teams of 2
-- `sow_lead` in `sow.config.yaml` is committed — changing it requires a PR, which is intentional but worth noting
-
-## What's been tried already
-
-None yet. Collaboration model designed and documented in `CLAUDE.md` (June 2026).
+- Personal branch config per user — not needed, Claude derives it from the SOW dir name
+- `/2ndbrain` checks for missing branch setup — GitHub will reject bad pushes; Claude recovers in context
+- Bypass rights or special lead permissions — handled at GitHub ruleset level, not here
 
 ## Decisions
 
-1. **SOW branch protection on GitHub**: Yes — protect `sow{N}` branches to require PRs from `sow{N}/<name>` contributors. GitHub supports branch protection rules with wildcard patterns (e.g. `sow*`). This keeps the SOW lead aware of all team contributions and prevents accidental overlaps. Bootstrap instructions should include setting this up.
+1. **`/onboard`, not `/bootstrap`** — this is a one-time setup question that belongs alongside other SOW config fields (`SLACK_CHANNELS`, `DRIVE_FOLDERS`). Bootstrap is for pulling data in.
 
-2. **Who bootstraps**: Whoever runs bootstrap first becomes the de-facto SOW branch master. Doesn't have to be the PM — can be the Tech Lead if the PM isn't technical. The key is that one person does it and the `sow_lead` gets recorded correctly.
+2. **Branch name is derived, not stored** — `sow3` dir → `sow3` branch. No need to store it explicitly.
 
-3. **Branch creation**: Bootstrap creates the branch automatically (`git checkout -b <branch> && git push -u origin <branch>`) — no manual step for the user.
+3. **Branch protection is a suggestion** — some leads are fine with direct pushes for chore commits. Enforcing it would add friction for no gain in those cases.
 
-4. **SOW lead rotation**: When a SOW lead rotates off, there's a handover process — the repo owner inherits the SOW branch or it's transferred to the incoming lead. This requires updating `sow_lead` in `sow.config.yaml` (via PR) and agreeing on branch ownership. A `/handover` command or checklist may be worth adding as a future feature.
+4. **SOW lead rotation** — when a lead rotates off, update `sow_lead` in `sow.config.yaml` via a PR and agree on who takes merge authority on the branch. A `/handover` checklist may be worth adding as a future feature.

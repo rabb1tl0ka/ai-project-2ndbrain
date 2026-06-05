@@ -36,3 +36,7 @@ GEMINI_NOTES_DOCS: ""
 # Used by /publish-to-notion (write) and /bootstrap (read)
 # Open the Notion page and paste the URL
 NOTION_PROJECT_URL: ""
+
+# Person responsible for delivery on this SOW — has merge authority on the sow{N} branch
+# Set by /onboard. Lowercase first name (e.g. "ronny", "bruno")
+sow_lead: ""

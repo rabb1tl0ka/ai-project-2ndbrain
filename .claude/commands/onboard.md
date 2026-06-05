@@ -134,6 +134,10 @@ If `sows/<sow>` already exists, skip the copy and note it.
    > Only needed if notes aren't all in one folder.
    > Press enter to skip."
 
+9. **sow_lead** (required)
+   > "Who is the lead for [sow]? This is the person responsible for delivery — they'll have merge authority on the `[sow]` branch.
+   > (e.g. `ronny`, `bruno`) — lowercase, first name is fine."
+
 **5c — Write `sows/<sow>/sow.config.yaml`:**
 
 ```yaml
@@ -147,11 +151,46 @@ MEETING_FILTER: "<value or empty>"
 SOW_DOC_URL: "<value or empty>"
 SLACK_CHANNELS: "<value or empty>"
 GEMINI_NOTES_DOCS: "<value or empty>"
+sow_lead: "<value or empty>"
 ```
 
 Report: "Configured sows/<sow>/."
 
-Repeat 5a–5c for every SOW in the list.
+**5d — Create the long-lived SOW branch:**
+
+Check if the branch already exists on origin:
+```bash
+git ls-remote --heads origin <sow>
+```
+
+If it does NOT exist:
+```bash
+git checkout -b <sow>
+git push -u origin <sow>
+git checkout -
+```
+
+Print:
+```
+✓ Branch `<sow>` created and pushed to origin.
+  Team members should branch off `<sow>` and PR back into it.
+  You PR `<sow>` → `main` periodically to sync with the rest of the engagement.
+```
+
+Then print a suggestion:
+```
+💡 Consider protecting `<sow>` on GitHub to require PRs from team members
+   (Settings → Branches → Add ruleset). Keeps contributions visible and
+   avoids accidental direct pushes. Optional — skip if you're fine with
+   direct pushes from the lead.
+```
+
+If the branch already exists:
+```
+✓ Branch `<sow>` already exists on origin — skipped creation.
+```
+
+Repeat 5a–5d for every SOW in the list.
 
 ---
 
@@ -165,6 +204,7 @@ Onboarding complete.
 ✓  config.yaml written
 ✓  Vault placeholders replaced
 ✓  SOWs created: <list>
+✓  Branches created on origin: <list of sow branches created, or "none — all already existed">
 
 Next: run /bootstrap to load the brain with real project data
 (SOW documents, meeting notes, Slack history — for all SOWs).
