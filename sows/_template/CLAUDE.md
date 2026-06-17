@@ -3,8 +3,9 @@
 ## Session Start
 
 Before doing anything else for this SOW:
-1. Read `{{SOW_NAME}}-tasks.md` — get full situational awareness of open items
-2. Note any blocked tasks — these surface in TLUs as CTAs
+1. Read `sow-context.md` — current scope, status, open items, and blockers for this SOW
+2. Read `{{SOW_NAME}}-tasks.md` — get full situational awareness of open items
+3. Note any blocked tasks — these surface in TLUs as CTAs
 
 ## Task Board Rules
 

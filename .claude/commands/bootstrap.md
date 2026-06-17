@@ -249,6 +249,48 @@ source: <NOTION_PROJECT_URL>
 
 ---
 
+### F — SOW context snapshot
+
+Synthesize everything gathered for this SOW (steps B through E) into `sows/<sow>/sow-context.md`. This is the primary context file Claude reads when working inside this SOW.
+
+```markdown
+---
+last_updated: YYYY-MM-DD
+generated_by: /bootstrap
+sow: <sow>
+---
+
+# SOW Context — <sow>
+
+## What this SOW is
+(1-2 sentences: what Loka is delivering, why the client wants it)
+
+## Scope summary
+- Key deliverables with due dates or milestones
+- Out-of-scope items worth noting
+
+## Current status
+(based on most recent meetings and Slack for this SOW)
+
+## Key people on this SOW
+| Name | Company | Role |
+|------|---------|------|
+
+## Key decisions made
+(from meeting summaries for this SOW)
+
+## Open items and blockers
+(from meeting action items + Slack for this SOW — flag any `status: blocked` as TLU material)
+
+## ⚠ Tensions and gaps
+- **Scope creep**: work discussed or done that isn't in this SOW
+- **Unaddressed commitments**: SOW deliverables with no meeting or Slack discussion yet
+- **Timeline drift**: dates in the SOW doc vs. pace visible in meetings/Slack
+- **Ambiguous ownership**: deliverables with no clear Loka owner
+```
+
+---
+
 ## After all SOWs — Stakeholder stubs
 
 Collect all non-@loka.com people identified across all SOWs (meeting attendees + Slack participants).
@@ -285,11 +327,11 @@ Report: "Created N stakeholder stubs: [names]."
 
 ---
 
-## After all SOWs — Context snapshot
+## After all SOWs — Client context
 
-Synthesize everything across all SOWs into `notes/project-context.md`.
+Synthesize the client-level view across all SOWs into `stakeholders/client-context.md`. This is engagement-wide context — who the client is, the overall health of the relationship, and tensions that span SOWs. Per-SOW detail lives in each `sows/<sow>/sow-context.md`.
 
-The "Tensions and gaps" section is the most important output — scope creep, unaddressed commitments, and misaligned expectations. Be explicit. If nothing found: "No tensions or gaps detected at bootstrap time."
+The "Cross-SOW tensions" section is the most important output — scope creep, unaddressed commitments, and misaligned expectations that span multiple SOWs. Be explicit. If nothing found: "No cross-SOW tensions detected at bootstrap time."
 
 ```markdown
 ---
@@ -298,35 +340,33 @@ generated_by: /bootstrap
 sows_processed: [list]
 ---
 
-# Project Context — {{CLIENT_NAME}}
+# Client Context — {{CLIENT_NAME}}
 
-## What this engagement is
-(1-2 sentences from SOW docs + meetings + Slack — what is Loka actually doing?)
+## Who this client is
+(1-2 sentences: what does this company do, what's their industry, why did they engage Loka)
 
-## SOW summary
-| SOW | Scope | Status | Key dates |
-|-----|-------|--------|-----------|
+## What Loka is doing for them
+(1-2 sentences: the overall engagement mission across all SOWs)
 
-## Current status
-(based on most recent meetings and Slack across all SOWs)
+## SOW map
+| SOW | Scope summary | Status | Context file |
+|-----|---------------|--------|--------------|
+| sow1 | ... | ... | [sow-context.md](../sows/sow1/sow-context.md) |
 
-## Key people
+## Key people across SOWs
 | Name | Company | Role | SOWs |
 |------|---------|------|------|
 
-## Open items and blockers
-(from meeting action items + Slack, across all SOWs)
+## Overall engagement health
+(based on most recent meetings and Slack across all SOWs — is the relationship healthy? Any recurring friction?)
 
-## Key decisions made so far
-(from meeting summaries, across all SOWs)
-
-## ⚠ Tensions and gaps
-Check for across all SOWs:
+## ⚠ Cross-SOW tensions and gaps
+Check across all SOWs for issues that span engagement-wide:
 - **Scope creep**: work discussed or done that isn't in any SOW
 - **Unaddressed commitments**: SOW deliverables with no meeting or Slack discussion yet
 - **Timeline drift**: dates in SOW docs vs. pace visible in meetings/Slack
 - **Missing people**: client contacts named in SOW docs who haven't appeared in meetings or Slack
-- **Ambiguous ownership**: deliverables with no clear Loka owner
+- **Ambiguous ownership**: deliverables with no clear Loka owner across SOWs
 ```
 
 ---
@@ -368,12 +408,13 @@ Bootstrap complete.
 ✓  [sow] N meetings     → sows/<sow>/meeting-summaries/
 ✓  [sow] Slack context  → sows/<sow>/slack-context.md
 ✓  [sow] Notion context → sows/<sow>/notion-context.md  (or "skipped — not configured")
-✓  [sow] branch        → origin/<sow>  (or "already existed")
+✓  [sow] SOW context    → sows/<sow>/sow-context.md
+✓  [sow] branch         → origin/<sow>  (or "already existed")
 
-✓  M stakeholder stubs → stakeholders/
-✓  Context snapshot    → notes/project-context.md
+✓  M stakeholder stubs  → stakeholders/
+✓  Client context       → stakeholders/client-context.md
 
-Start here: notes/project-context.md
+Start here: stakeholders/client-context.md
 ```
 
 Flag any SOWs that were skipped or had missing data.

@@ -61,7 +61,7 @@ This pulls in the SOW document, all historical meeting notes from Google Drive, 
 
 **4. Fill in any gaps**
 
-Open `notes/project-context.md` — that's your ground truth. Fill in team profiles in `team/`, enrich stakeholder profiles in `stakeholders/`, and address any tensions flagged by bootstrap.
+Open `stakeholders/client-context.md` for the engagement-wide view, and each `sows/<sow>/sow-context.md` for per-SOW status. Fill in team profiles in `team/`, enrich stakeholder profiles in `stakeholders/`, and address any tensions flagged by bootstrap.
 
 **5. Create your SOW branch and push**
 
