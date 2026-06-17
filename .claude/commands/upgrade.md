@@ -74,6 +74,7 @@ Files to update:
 - `.claude/commands/upgrade.md`
 - `config.example.yaml`
 - `README.md`
+- `sows/_template/CLAUDE.md`
 - `sows/_template/sow.config.yaml`
 - `sows/_template/sow-reference.md`
 - `templates/meeting-summary.md`
