@@ -83,6 +83,55 @@ For each file:
 
 ---
 
+## Task board review
+
+After all meetings are processed, review the task board and propose updates based on what surfaced across the meeting summaries.
+
+1. Read the current task board: `sows/<sow>/<sow>-tasks.md`
+2. Read the current week's done log: `sows/<sow>/done/YYYY-WW.md` (current ISO week)
+3. Scan all processed meeting summaries for:
+   - **New action items** with a clear owner → candidate for a new task
+   - **Resolved items** — tasks confirmed done by anyone in the meeting → candidate to close
+   - **Status changes** — a blocker that got unblocked, or a new blocker introduced → candidate to update
+   - **New blockers** from NEEDS FURTHER DISCUSSION or unowned action items → candidate to add as `blocked`
+
+4. Present a proposed diff — do not write anything yet:
+
+   ```
+   ## Proposed task board changes
+
+   ADD
+   - [slug]: [task description] | [owner] | [priority] | [due if known] | [session slug]
+
+   CLOSE
+   - [task-id]: [reason from meeting]
+
+   UPDATE
+   - [task-id]: [what changes and why]
+
+   No changes needed: [task-ids that appeared in the meeting but are already accurate]
+   ```
+
+5. Ask: "Apply these changes, adjust, or skip?"
+
+6. On confirmation, apply the changes:
+   - New tasks: append rows to the task board following the task schema
+   - Closed tasks: move to the done log (`sows/<sow>/done/YYYY-WW.md`) with today's date, remove from task board
+   - Updated tasks: edit the relevant row in place
+
+### Task schema (for reference when adding rows)
+
+| ID | Task | Owner | Priority | Due | Session | Status | Notes |
+|----|------|-------|----------|-----|---------|--------|-------|
+
+- `ID`: short slug (`kickoff-01`, `arch-review-02`)
+- `Priority`: `high` / `medium` / `low` — infer from context if not explicit
+- `Due`: date if stated, otherwise empty
+- `Session`: slug of the working session this came from, or the meeting slug if no working session applies
+- `Status`: `open` or `blocked`
+
+---
+
 ## State file format
 
 `.meeting-recap-state.md` contains a single line:
