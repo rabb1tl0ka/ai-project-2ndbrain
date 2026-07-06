@@ -1,4 +1,4 @@
-Overwrite a Google Spreadsheet with the current contents of the SOW task board, so teammates and stakeholders have a shareable view without repo access.
+Publish the current SOW task board to Google Sheets as a dated snapshot, so teammates and stakeholders have a shareable view without repo access.
 
 ## Usage
 
@@ -12,9 +12,9 @@ Overwrite a Google Spreadsheet with the current contents of the SOW task board, 
 
 ## Important constraint
 
-The Google Drive MCP has no way to update an existing file's content in place — only `create_file` (new file) and `copy_file` (duplicate). So this skill does **not** overwrite the spreadsheet in place. Every run **creates a brand-new spreadsheet** with a new file ID and a new link, and the old one is left behind in Drive.
+The Google Drive MCP has no way to update an existing file's content in place — only `create_file` (new file) and `copy_file` (duplicate). So this skill does **not** overwrite a spreadsheet in place. Every run **creates a brand-new spreadsheet**, titled with today's date, and leaves prior syncs alone in Drive.
 
-This means the shareable link changes on every sync. Always report the new link at the end and remind the user to re-share it and to trash the old file manually.
+Rather than fight this, lean into it: each sync is a dated snapshot of task status at that moment, not a single continuously-updated sheet. The shareable link changes on every sync — always report the new link and remind the user to re-share it. Older snapshots are left in Drive intentionally as history, not clutter to clean up.
 
 ---
 
@@ -37,7 +37,7 @@ Stop here.
 
 ### 3 — Read SOW config
 
-Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `TASK_BOARD_SHEET_ID` (and `TASK_BOARD_SHEET_URL` if present).
+Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `TASK_BOARD_SHEET_URL` (the link to the most recent snapshot, if any).
 
 If `DRIVE_FOLDERS` is empty, ask:
 > "No Drive folder configured for <sow>. Paste a Google Drive folder URL where the task board spreadsheet should live."
@@ -61,29 +61,29 @@ Convert to CSV:
 
 If the table has no data rows (empty task board), still produce a CSV with just the header row.
 
-### 2 — Create the new spreadsheet
+### 2 — Create the new snapshot spreadsheet
 
 Use the Google Drive MCP `create_file` tool:
-- `title`: `<SOW name> Task Board — YYYY-MM-DD` (today's date)
+- `title`: `<SOW name> Task Board — YYYY-MM-DD` (today's date — this is what makes it a dated snapshot, not just a new file)
 - `textContent`: the CSV built above
 - `contentMimeType`: `text/csv`
 - `parentId`: the folder ID from pre-flight step 3
 
 Leave `disableConversionToGoogleType` unset (default) so Drive converts the CSV upload into a native Google Sheet.
 
+If a spreadsheet with the same title (i.e. a sync already ran today) already exists in that folder, still create a new one — don't try to reuse or update it. Multiple snapshots on the same day are fine; Drive's own "created" timestamp disambiguates them.
+
 ### 3 — Update sow.config.yaml
 
-Write the new file's ID to `TASK_BOARD_SHEET_ID` and its Drive URL to `TASK_BOARD_SHEET_URL` in `sows/<sow>/sow.config.yaml`, replacing whatever was there before.
+Write the new file's ID to `TASK_BOARD_SHEET_ID` and its Drive URL to `TASK_BOARD_SHEET_URL` in `sows/<sow>/sow.config.yaml` — these always point at the **latest** snapshot, not a single persistent sheet.
 
 ### 4 — Report
 
 ```
 ✓ Synced task board for <sow>
-  New spreadsheet: <new-url>
+  Snapshot: <new-url> (dated YYYY-MM-DD)
 
 Heads up:
-- This is a new file — share permissions from the old spreadsheet did NOT carry over. Re-share the link above with anyone who needs access.
-- The previous spreadsheet (<old-url>, if one existed) is still in Drive — trash it manually if you don't want duplicates piling up.
+- This is a new file — share permissions from the previous snapshot did NOT carry over. Re-share the link above with anyone who needs access.
+- Older snapshots stay in Drive as history — that's intentional, not a mess to clean up.
 ```
-
-If `TASK_BOARD_SHEET_URL` was empty before this run (first sync), omit the "previous spreadsheet" line.

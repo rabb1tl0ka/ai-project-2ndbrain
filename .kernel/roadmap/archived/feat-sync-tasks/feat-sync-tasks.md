@@ -19,7 +19,7 @@ The problem is keeping them in sync. Auto-sync on every task board change is fra
 
 ### How it works
 
-**Implementation note:** the Google Drive MCP available in this environment has no tool to overwrite an existing file's content or delete a file — only `create_file` (new file) and `copy_file` (duplicate). True in-place overwrite, as originally envisioned below, isn't possible with these tools. Confirmed with the user (2026-07-06); the accepted approach is "recreate + re-share on every sync" (see Downsides).
+**Implementation note:** the Google Drive MCP available in this environment has no tool to overwrite an existing file's content or delete a file — only `create_file` (new file) and `copy_file` (duplicate). True in-place overwrite, as originally envisioned below, isn't possible with these tools. Confirmed with the user (2026-07-06); the accepted approach is "recreate as a dated snapshot on every sync" — reframed from a workaround into the actual design (2026-07-06, after living with it in practice): each sync is a dated spreadsheet capturing task status at that moment, not one continuously-updated sheet.
 
 1. User runs `/sync-tasks` (optionally with a SOW name if multiple SOWs exist)
 2. Skill reads `sows/<sow>/<sow>-tasks.md`
@@ -60,10 +60,10 @@ Every run (first or subsequent) creates a new spreadsheet in `DRIVE_FOLDERS[0]` 
 
 ## Downsides / risks
 
-- The spreadsheet link changes on every sync (a new file is created each time, since the Drive MCP can't overwrite in place) — the user must re-share the new link and manually trash the old file. This is the biggest deviation from the original "shareable, stable link" goal.
+- The spreadsheet link changes on every sync (a new file is created each time, since the Drive MCP can't overwrite in place) — the user must re-share the new link each time. Reframed as a dated-snapshot feature rather than fought as a bug, this is now an accepted tradeoff, not a defect.
 - Drive MCP must be available in the session — skill fails gracefully if not, but can't auto-recover
 - If multiple SOWs exist and user doesn't specify, skill must ask which SOW — minor friction
-- Old spreadsheets accumulate in Drive unless manually trashed after each sync
+- Old snapshots accumulate in Drive over time — intentional (history), but worth knowing if Drive storage/clutter ever becomes a concern
 
 ## Implementation steps
 

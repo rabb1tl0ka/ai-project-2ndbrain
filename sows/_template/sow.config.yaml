@@ -41,11 +41,12 @@ NOTION_PROJECT_URL: ""
 # Set by /onboard. Lowercase first name (e.g. "ronny", "bruno")
 sow_lead: ""
 
-# Google Drive file ID of the current task board spreadsheet, written by /sync-tasks.
-# Each /sync-tasks run creates a NEW spreadsheet (the Drive MCP can't overwrite file
-# content in place) and overwrites this ID — do not edit by hand.
+# Google Drive file ID of the most recent task board snapshot, written by /sync-tasks.
+# Each /sync-tasks run creates a NEW dated spreadsheet (the Drive MCP can't overwrite
+# file content in place) and overwrites this ID to point at the latest one — do not
+# edit by hand. Older snapshots stay in Drive as history.
 TASK_BOARD_SHEET_ID: ""
 
-# Shareable link to the current task board spreadsheet, written by /sync-tasks.
+# Shareable link to the most recent task board snapshot, written by /sync-tasks.
 # Changes on every sync — re-share this link with stakeholders after each run.
 TASK_BOARD_SHEET_URL: ""
