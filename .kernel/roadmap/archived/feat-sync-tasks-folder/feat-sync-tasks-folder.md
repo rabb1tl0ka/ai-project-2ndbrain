@@ -1,5 +1,5 @@
 ---
-status: todo
+status: done
 priority: medium
 owner: ""
 phase: ""
@@ -49,6 +49,13 @@ Existing repos already have `TASK_BOARD_FOLDER_ID: ""` (if they ran the upgrade 
 
 - Existing repos need to set `TASK_BOARD_FOLDER_ID` on first run — slight friction, but the prompt handles it
 - If someone sets `TASK_BOARD_FOLDER_ID` to a client-shared folder, the problem recurs — no guardrail beyond the config comment
+
+## Test Plan
+
+- `sows/_template/sow.config.yaml` contains the `TASK_BOARD_FOLDER_ID` field.
+- `.claude/commands/sync-tasks.md` reads `TASK_BOARD_FOLDER_ID` (not `DRIVE_FOLDERS[0]`) to derive the spreadsheet's `parentId`, and contains the prompt copy for when it's empty.
+- `.kernel/upgrade.sh` backfills `TASK_BOARD_FOLDER_ID: ""` into existing `sows/<sow>/sow.config.yaml` files that don't already have it (synthetic tempdir test: a SOW config without the field gets it appended; a SOW config that already has it is left untouched; `sows/_template` is not touched by the backfill loop since it's already covered by the plain file copy).
+- Edge cases: empty `TASK_BOARD_FOLDER_ID` with a value present triggers no prompt; a config file missing the field entirely is treated the same as an empty field for backfill purposes.
 
 ## Implementation steps
 

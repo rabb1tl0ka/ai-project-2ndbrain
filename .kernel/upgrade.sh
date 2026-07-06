@@ -131,6 +131,36 @@ copy_file ".kernel/upgrade.sh"
 # .gitignore (ensures config.yaml and other sensitive files stay untracked)
 copy_file ".gitignore"
 
+# ── Backfill new fields into existing per-SOW sow.config.yaml files ──────────
+# sows/_template/sow.config.yaml is already replaced wholesale above. Real SOWs
+# (sows/<sow>/sow.config.yaml) are never overwritten — only missing fields are
+# appended, so existing values (folder URLs, sheet IDs, etc.) are preserved.
+
+echo "Backfilling new config fields into existing SOWs..."
+
+BACKFILLED_CONFIGS=()
+
+for config in "$TARGET"/sows/*/sow.config.yaml; do
+    [ -f "$config" ] || continue
+    case "$config" in
+        "$TARGET/sows/_template/sow.config.yaml") continue ;;
+    esac
+
+    if ! grep -q "^TASK_BOARD_FOLDER_ID:" "$config"; then
+        {
+            echo ""
+            echo "# Google Drive folder ID where /sync-tasks drops task board snapshots."
+            echo "# Should be a Loka-internal folder, NOT one shared with the client."
+            echo "# If empty, /sync-tasks will ask for a folder URL before proceeding."
+            echo 'TASK_BOARD_FOLDER_ID: ""'
+        } >> "$config"
+        echo "  ✓ ${config#$TARGET/} — added TASK_BOARD_FOLDER_ID"
+        BACKFILLED_CONFIGS+=("${config#$TARGET/}")
+    fi
+done
+
+echo ""
+
 # Version stamp
 mkdir -p "$TARGET/.kernel"
 echo "$CURRENT_TAG" > "$VERSION_FILE"
@@ -149,6 +179,7 @@ STAGED_PATHS=(
     ".kernel/.2ndbrain-version"
     ".kernel/upgrade.sh"
     ".gitignore"
+    "${BACKFILLED_CONFIGS[@]}"
 )
 
 if [ "$CREATE_PR" = true ]; then

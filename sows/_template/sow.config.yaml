@@ -50,3 +50,8 @@ TASK_BOARD_SHEET_ID: ""
 # Shareable link to the most recent task board snapshot, written by /sync-tasks.
 # Changes on every sync — re-share this link with stakeholders after each run.
 TASK_BOARD_SHEET_URL: ""
+
+# Google Drive folder ID where /sync-tasks drops task board snapshots.
+# Should be a Loka-internal folder, NOT one shared with the client.
+# If empty, /sync-tasks will ask for a folder URL before proceeding.
+TASK_BOARD_FOLDER_ID: ""

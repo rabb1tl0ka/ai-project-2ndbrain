@@ -247,7 +247,7 @@ def test_sync_tasks_config_and_skill():
     repo = Path(__file__).parent.parent
 
     config_content = (repo / "sows/_template/sow.config.yaml").read_text()
-    for field in ["TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL"]:
+    for field in ["TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "TASK_BOARD_FOLDER_ID"]:
         if field in config_content:
             ok(f"{field} present in sow.config.yaml template")
         else:
@@ -261,11 +261,86 @@ def test_sync_tasks_config_and_skill():
         return
 
     skill_content = skill_path.read_text()
-    for phrase in ["create_file", "TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "new spreadsheet"]:
+    for phrase in ["create_file", "TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "new spreadsheet", "TASK_BOARD_FOLDER_ID"]:
         if phrase in skill_content:
             ok(f"sync-tasks.md mentions '{phrase}'")
         else:
             fail(f"sync-tasks.md mentions '{phrase}'")
+
+    if "Parse `DRIVE_FOLDERS`" not in skill_content:
+        ok("sync-tasks.md no longer derives parentId from DRIVE_FOLDERS")
+    else:
+        fail("sync-tasks.md no longer derives parentId from DRIVE_FOLDERS")
+
+
+# ─── /sync-tasks folder backfill (upgrade.sh) ─────────────────────────────────
+
+def test_upgrade_backfills_task_board_folder_id():
+    section("upgrade.sh backfills TASK_BOARD_FOLDER_ID")
+    repo = Path(__file__).parent.parent
+
+    upgrade_content = (repo / ".kernel/upgrade.sh").read_text()
+    if "TASK_BOARD_FOLDER_ID" in upgrade_content and "BACKFILLED_CONFIGS" in upgrade_content:
+        ok("upgrade.sh contains TASK_BOARD_FOLDER_ID backfill logic")
+    else:
+        fail("upgrade.sh contains TASK_BOARD_FOLDER_ID backfill logic")
+        return
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        target = Path(tmpdir)
+
+        # SOW missing the field entirely — should get it appended
+        missing = target / "sows/sow1"
+        missing.mkdir(parents=True)
+        (missing / "sow.config.yaml").write_text('DRIVE_FOLDERS: "https://drive.google.com/drive/folders/abc"\n')
+
+        # SOW that already has the field — should be left untouched
+        present = target / "sows/sow2"
+        present.mkdir(parents=True)
+        (present / "sow.config.yaml").write_text(
+            'DRIVE_FOLDERS: ""\nTASK_BOARD_FOLDER_ID: "already-set"\n'
+        )
+
+        # _template — backfill loop must skip it (handled by the plain file copy instead)
+        template = target / "sows/_template"
+        template.mkdir(parents=True)
+        (template / "sow.config.yaml").write_text('DRIVE_FOLDERS: ""\n')
+
+        backfill_script = f"""
+        set -e
+        TARGET="{target}"
+        for config in "$TARGET"/sows/*/sow.config.yaml; do
+            [ -f "$config" ] || continue
+            case "$config" in
+                "$TARGET/sows/_template/sow.config.yaml") continue ;;
+            esac
+            if ! grep -q "^TASK_BOARD_FOLDER_ID:" "$config"; then
+                echo 'TASK_BOARD_FOLDER_ID: ""' >> "$config"
+            fi
+        done
+        """
+        result = subprocess.run(["bash", "-c", backfill_script], capture_output=True)
+        if result.returncode != 0:
+            fail("backfill script ran", result.stderr.decode())
+            return
+
+        missing_content = (missing / "sow.config.yaml").read_text()
+        if 'TASK_BOARD_FOLDER_ID: ""' in missing_content:
+            ok("field appended to SOW config missing it")
+        else:
+            fail("field appended to SOW config missing it", repr(missing_content))
+
+        present_content = (present / "sow.config.yaml").read_text()
+        if present_content.count("TASK_BOARD_FOLDER_ID") == 1 and "already-set" in present_content:
+            ok("existing field left untouched, not duplicated")
+        else:
+            fail("existing field left untouched, not duplicated", repr(present_content))
+
+        template_content = (template / "sow.config.yaml").read_text()
+        if "TASK_BOARD_FOLDER_ID" not in template_content:
+            ok("_template skipped by backfill loop")
+        else:
+            fail("_template skipped by backfill loop", repr(template_content))
 
 
 def _markdown_table_to_csv(markdown):
@@ -481,6 +556,7 @@ def main():
     test_sow_config_template()
     test_sow_config_parsing()
     test_sync_tasks_config_and_skill()
+    test_upgrade_backfills_task_board_folder_id()
     test_task_board_csv_parsing()
     test_upgrade_covers_all_commands()
     test_sow_branch_naming()

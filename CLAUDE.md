@@ -188,6 +188,8 @@ Teammates and stakeholders without repo access can get a read-only view of a SOW
 
 Run `/sync-tasks` (optionally with a SOW name) to publish the current task board to Drive. Because the Google Drive MCP can't overwrite a file's content in place, **every sync creates a brand-new spreadsheet titled with today's date** rather than updating one persistent sheet. Treat this as a feature, not a workaround: each sync is a dated snapshot of task status at that moment, and older snapshots are left in Drive intentionally as history. The latest snapshot's ID and URL are written to `TASK_BOARD_SHEET_ID` / `TASK_BOARD_SHEET_URL` in `sows/<sow>/sow.config.yaml` — re-share the new link with stakeholders after each sync.
 
+Spreadsheets are dropped into the folder set by `TASK_BOARD_FOLDER_ID` in `sow.config.yaml` — a dedicated field kept separate from `DRIVE_FOLDERS` (which is for meeting notes and often points at a client-shared folder). This should always be a Loka-internal folder. If it's empty, `/sync-tasks` will ask for a folder URL and save it before proceeding.
+
 ---
 
 ## Stakeholder & Team Profiles

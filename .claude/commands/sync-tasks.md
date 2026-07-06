@@ -37,12 +37,14 @@ Stop here.
 
 ### 3 — Read SOW config
 
-Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `TASK_BOARD_SHEET_URL` (the link to the most recent snapshot, if any).
+Read `sows/<sow>/sow.config.yaml`. Extract `TASK_BOARD_FOLDER_ID` and `TASK_BOARD_SHEET_URL` (the link to the most recent snapshot, if any).
 
-If `DRIVE_FOLDERS` is empty, ask:
-> "No Drive folder configured for <sow>. Paste a Google Drive folder URL where the task board spreadsheet should live."
+`TASK_BOARD_FOLDER_ID` is a dedicated, Loka-internal Drive folder for task board snapshots — deliberately separate from `DRIVE_FOLDERS`, which is configured for meeting notes and often points at a folder shared with the client. Never fall back to `DRIVE_FOLDERS` for this.
 
-Parse `DRIVE_FOLDERS` as comma-separated URLs and take the **first** one. Extract its folder ID (last path segment after `/folders/`) — this is the `parentId` for the new spreadsheet.
+If `TASK_BOARD_FOLDER_ID` is empty, ask:
+> "No task board folder configured for `<sow>`. Paste a Google Drive folder URL for the task board (use a Loka-internal folder, not one shared with the client)."
+
+Extract the folder ID from the pasted URL (last path segment after `/folders/`) and write it to `TASK_BOARD_FOLDER_ID` in `sows/<sow>/sow.config.yaml` before proceeding. This is the `parentId` for the new spreadsheet.
 
 ---
 
