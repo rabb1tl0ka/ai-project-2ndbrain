@@ -182,6 +182,14 @@ TLUs are weekly status updates — typically for the Sales Lead or engagement sp
 
 ---
 
+## Task Board Spreadsheet Sync
+
+Teammates and stakeholders without repo access can get a read-only view of a SOW's task board via a Google Spreadsheet. The markdown file (`sows/<sow>/<sow>-tasks.md`) is always the source of truth — the spreadsheet is a derived, one-way export.
+
+Run `/sync-tasks` (optionally with a SOW name) to push the current task board to Drive. Because the Google Drive MCP can't overwrite a file's content in place, **every sync creates a brand-new spreadsheet with a new link** — the new ID and URL are written to `TASK_BOARD_SHEET_ID` / `TASK_BOARD_SHEET_URL` in `sows/<sow>/sow.config.yaml`. Re-share the new link after each sync, and trash the previous spreadsheet in Drive if you don't want duplicates.
+
+---
+
 ## Stakeholder & Team Profiles
 
 **Stakeholders** (client-side): `stakeholders/<name>/profile.md`

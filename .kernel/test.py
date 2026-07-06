@@ -240,6 +240,126 @@ sow_lead: "ronny"
             fail("Empty fields parse as empty string", repr(parsed.get("SOW_DOC_URL")))
 
 
+# ─── /sync-tasks ──────────────────────────────────────────────────────────────
+
+def test_sync_tasks_config_and_skill():
+    section("sync-tasks config + skill")
+    repo = Path(__file__).parent.parent
+
+    config_content = (repo / "sows/_template/sow.config.yaml").read_text()
+    for field in ["TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL"]:
+        if field in config_content:
+            ok(f"{field} present in sow.config.yaml template")
+        else:
+            fail(f"{field} present in sow.config.yaml template")
+
+    skill_path = repo / ".claude/commands/sync-tasks.md"
+    if skill_path.is_file():
+        ok(".claude/commands/sync-tasks.md exists")
+    else:
+        fail(".claude/commands/sync-tasks.md exists")
+        return
+
+    skill_content = skill_path.read_text()
+    for phrase in ["create_file", "TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "new spreadsheet"]:
+        if phrase in skill_content:
+            ok(f"sync-tasks.md mentions '{phrase}'")
+        else:
+            fail(f"sync-tasks.md mentions '{phrase}'")
+
+
+def _markdown_table_to_csv(markdown):
+    """Mirrors the parsing algorithm described in .claude/commands/sync-tasks.md."""
+    def split_row(line):
+        cells = [c.strip() for c in line.strip().split("|")]
+        # drop empty leading/trailing cells produced by the outer pipes
+        if cells and cells[0] == "":
+            cells = cells[1:]
+        if cells and cells[-1] == "":
+            cells = cells[:-1]
+        return cells
+
+    def is_separator(cells):
+        return all(set(c) <= {"-"} for c in cells if c != "")
+
+    def csv_escape(cell):
+        if any(ch in cell for ch in [",", '"', "\n"]):
+            return '"' + cell.replace('"', '""') + '"'
+        return cell
+
+    rows = []
+    for line in markdown.strip().splitlines():
+        line = line.strip()
+        if not line.startswith("|"):
+            continue
+        cells = split_row(line)
+        if is_separator(cells):
+            continue
+        rows.append(cells)
+
+    return "\n".join(",".join(csv_escape(c) for c in row) for row in rows)
+
+
+def test_task_board_csv_parsing():
+    section("Task board markdown -> CSV parsing")
+
+    header_only = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
+|----|------|-------|----------|-----|---------|--------|-------|
+"""
+    csv = _markdown_table_to_csv(header_only)
+    if csv == "ID,Task,Owner,Priority,Due,Session,Status,Notes":
+        ok("Empty task board produces header-only CSV")
+    else:
+        fail("Empty task board produces header-only CSV", repr(csv))
+
+    normal_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
+|----|------|-------|----------|-----|---------|--------|-------|
+| kickoff-01 | Send agenda | bruno | high | 2026-07-10 | kickoff | open | |
+"""
+    csv = _markdown_table_to_csv(normal_row)
+    lines = csv.splitlines()
+    if len(lines) == 2 and lines[1].split(",")[:3] == ["kickoff-01", "Send agenda", "bruno"]:
+        ok("Normal data row parses into the right fields")
+    else:
+        fail("Normal data row parses into the right fields", repr(lines))
+
+    comma_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
+|----|------|-------|----------|-----|---------|--------|-------|
+| t-01 | Fix bug | bruno | high | | tech | open | blocked, waiting on client |
+"""
+    csv = _markdown_table_to_csv(comma_row)
+    if '"blocked, waiting on client"' in csv:
+        ok("Cell with a comma is quoted")
+    else:
+        fail("Cell with a comma is quoted", repr(csv))
+
+    quote_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
+|----|------|-------|----------|-----|---------|--------|-------|
+| t-02 | Say "hi" | bruno | low | | tech | open | |
+"""
+    csv = _markdown_table_to_csv(quote_row)
+    if '"Say ""hi"""' in csv:
+        ok("Cell with a double quote is escaped and wrapped")
+    else:
+        fail("Cell with a double quote is escaped and wrapped", repr(csv))
+
+
+# ─── /upgrade file coverage ───────────────────────────────────────────────────
+
+def test_upgrade_covers_all_commands():
+    section("/upgrade command coverage")
+    repo = Path(__file__).parent.parent
+    upgrade_content = (repo / ".claude/commands/upgrade.md").read_text()
+
+    commands_dir = repo / ".claude/commands"
+    for cmd_file in sorted(commands_dir.glob("*.md")):
+        rel = f".claude/commands/{cmd_file.name}"
+        if rel in upgrade_content:
+            ok(f"{rel} listed in /upgrade's file list")
+        else:
+            fail(f"{rel} listed in /upgrade's file list")
+
+
 # ─── SOW branch naming ────────────────────────────────────────────────────────
 
 def test_sow_branch_naming():
@@ -360,6 +480,9 @@ def main():
     test_sow_task_board()
     test_sow_config_template()
     test_sow_config_parsing()
+    test_sync_tasks_config_and_skill()
+    test_task_board_csv_parsing()
+    test_upgrade_covers_all_commands()
     test_sow_branch_naming()
     test_placeholder_replacement()
     test_bootstrap_state()

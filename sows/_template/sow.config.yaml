@@ -40,3 +40,12 @@ NOTION_PROJECT_URL: ""
 # Person responsible for delivery on this SOW — has merge authority on the sow{N} branch
 # Set by /onboard. Lowercase first name (e.g. "ronny", "bruno")
 sow_lead: ""
+
+# Google Drive file ID of the current task board spreadsheet, written by /sync-tasks.
+# Each /sync-tasks run creates a NEW spreadsheet (the Drive MCP can't overwrite file
+# content in place) and overwrites this ID — do not edit by hand.
+TASK_BOARD_SHEET_ID: ""
+
+# Shareable link to the current task board spreadsheet, written by /sync-tasks.
+# Changes on every sync — re-share this link with stakeholders after each run.
+TASK_BOARD_SHEET_URL: ""

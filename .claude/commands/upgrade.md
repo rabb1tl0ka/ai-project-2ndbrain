@@ -71,6 +71,7 @@ Files to update:
 - `.claude/commands/meeting-recap.md`
 - `.claude/commands/publish-to-notion.md`
 - `.claude/commands/fetch-from-notion.md`
+- `.claude/commands/sync-tasks.md`
 - `.claude/commands/upgrade.md`
 - `config.example.yaml`
 - `README.md`
