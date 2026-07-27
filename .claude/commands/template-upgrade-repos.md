@@ -41,11 +41,14 @@ Same files the old script copied — this is the full sync set:
 .claude/commands/upgrade.md
 config.example.yaml
 README.md
+CLAUDE.md
 sows/_template/sow.config.yaml
 sows/_template/sow-reference.md
 templates/ (whole directory)
 .gitignore
 ```
+
+`CLAUDE.md` gets the same placeholder-aware handling as any other file in Step 3d — no special-casing needed. It's filled in by `/onboard`'s repo-wide `{{KEY}}` substitution (client name, owner, SOW list, etc.), so a target's copy will usually be a placeholder-substitution-only diff against the template's and merge cleanly; genuine hand-edits to `CLAUDE.md` (new sections, reworded rules) will correctly fall through to the conflict path in Step 4 instead of being silently overwritten.
 
 `.kernel/upgrade.sh` is no longer part of this list — that script is retired (see `.kernel/README.md`).
 
