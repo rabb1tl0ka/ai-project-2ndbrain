@@ -225,3 +225,4 @@ To start a new SOW: copy `sows/_template/` and rename it. Or run `/bootstrap --s
 - A markdown editor — [Obsidian](https://obsidian.md) recommended (any editor works)
 - Google Drive and Slack connected in Claude Code (for `/bootstrap`)
 - Notion connected in Claude Code (optional — for `/publish-to-notion` and `/fetch-from-notion`)
+- SSH access to [`github.com/rabb1tl0ka/claude-skills`](https://github.com/rabb1tl0ka/claude-skills) (optional — `/bootstrap` pulls the `action-board` skill from there on first run; without access, `/bootstrap` still completes, it just skips that step and `/action-board` won't be available until someone copies it in manually)

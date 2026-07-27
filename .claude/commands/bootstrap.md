@@ -373,7 +373,20 @@ Check across all SOWs for issues that span engagement-wide:
 
 ## Wrap up
 
-1. **Create SOW branch(es) if missing.**
+1. **Ensure the `action-board` skill is available.**
+
+   Check whether `.claude/skills/action-board/SKILL.md` already exists in this repo. If it does, skip this step silently.
+
+   Otherwise, pull it in from its source repo so every contributor gets `/action-board` (consolidated open-actions board across meeting summaries and working sessions) automatically on clone, with no separate global install needed:
+   ```bash
+   git clone --depth 1 git@github.com:rabb1tl0ka/claude-skills.git /tmp/claude-skills-bootstrap
+   mkdir -p .claude/skills
+   cp -r /tmp/claude-skills-bootstrap/action-board .claude/skills/action-board
+   rm -rf /tmp/claude-skills-bootstrap
+   ```
+   If the clone fails (no access, no network), note it and continue — the brain still works, `/action-board` just won't be available until someone copies it in manually. This is a one-time step; it won't re-run once the skill is present, so it never overwrites local edits to it.
+
+2. **Create SOW branch(es) if missing.**
 
    For each SOW that was processed, check whether a remote branch exists:
    ```bash
@@ -389,19 +402,21 @@ Check across all SOWs for issues that span engagement-wide:
 
    This is the branch everyone on this SOW works from — no PRs needed for day-to-day commits. PRs only go from `<sow>` → `main`.
 
-2. If this SOW's meetings were pulled via `DRIVE_FOLDERS`/`GEMINI_NOTES_DOCS` (this bootstrap step uses the same Drive-based discovery as `/meeting-recap-drive`), update `.meeting-recap-drive-state.md` `last_ran` to today — future `/meeting-recap-drive` runs only pick up new meetings. This doesn't seed `/meeting-recap`'s Calendar-based state — that skill tracks its own processed events independently and will pick up any Calendar-attached meetings on its own next run.
+3. If this SOW's meetings were pulled via `DRIVE_FOLDERS`/`GEMINI_NOTES_DOCS` (this bootstrap step uses the same Drive-based discovery as `/meeting-recap-drive`), update `.meeting-recap-drive-state.md` `last_ran` to today — future `/meeting-recap-drive` runs only pick up new meetings. This doesn't seed `/meeting-recap`'s Calendar-based state — that skill tracks its own processed events independently and will pick up any Calendar-attached meetings on its own next run.
 
-3. Update `.bootstrap-state.md`:
+4. Update `.bootstrap-state.md`:
 
 ```
 last_ran: YYYY-MM-DD
 sows_processed: <comma-separated list>
 ```
 
-4. Print:
+5. Print:
 
 ```
 Bootstrap complete.
+
+✓  action-board skill   → .claude/skills/action-board/  (or "already present" / "skipped — clone failed")
 
 <for each SOW>
 ✓  [sow] SOW doc        → sows/<sow>/<sow>-reference.md
