@@ -199,7 +199,43 @@ If the branch already exists:
 ✓ Branch `<sow>` already exists on origin — skipped creation.
 ```
 
-Repeat 5a–5d for every SOW in the list.
+**5e — Create your personal branch:**
+
+Derive `<yourname>` from `OWNER_NAME` (lowercase, first name — same convention as `sow_lead`).
+
+Check if `<sow>-<yourname>` already exists on origin:
+```bash
+git ls-remote --heads origin <sow>-<yourname>
+```
+
+Always branch off `origin/<sow>`, fetched fresh — never off whatever is currently checked out locally. A fresh clone defaults to `main`, which can lag behind `<sow>` (it only syncs on the periodic `<sow>` → `main` PR), so branching off local `HEAD` risks silently starting your branch from stale content.
+
+If it does NOT exist:
+```bash
+git fetch origin <sow>
+git checkout -b <sow>-<yourname> origin/<sow>
+git push -u origin <sow>-<yourname>
+```
+
+Print:
+```
+✓ Branch `<sow>-<yourname>` created from origin/<sow> and pushed.
+  This is your personal branch — commit and push here freely.
+  PR into `<sow>` when you're ready to merge your work in.
+```
+
+If it already exists on origin:
+```bash
+git fetch origin <sow>-<yourname>
+git checkout -b <sow>-<yourname> origin/<sow>-<yourname>
+```
+
+Print:
+```
+✓ Branch `<sow>-<yourname>` already exists on origin — checked out locally.
+```
+
+Repeat 5a–5e for every SOW in the list.
 
 ---
 
@@ -213,7 +249,12 @@ Onboarding complete.
 ✓  config.yaml written
 ✓  Vault placeholders replaced
 ✓  SOWs created: <list>
-✓  Branches created on origin: <list of sow branches created, or "none — all already existed">
+✓  SOW branches created on origin: <list, or "none — all already existed">
+✓  Your personal branch(es): <list of <sow>-<yourname> branches, and whether each was created or already existed>
+✓  Currently checked out on: <last SOW's personal branch>
+
+You're now on your own branch — commit and push freely, open a PR into
+each SOW branch when you're ready to merge your work in.
 
 Next: run /bootstrap to load the brain with real project data
 (SOW documents, meeting notes, Slack history — for all SOWs).

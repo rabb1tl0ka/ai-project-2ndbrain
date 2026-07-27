@@ -25,6 +25,25 @@ config.yaml          ← your engagement config, gitignored — never committed
 > - **Contributor:** the brain is already bootstrapped — see [Joining an existing brain](#joining-an-existing-brain) just below
 > - **Owner:** setting this up for the first time — follow [Creating a new brain](#creating-a-new-brain)
 
+## Branching strategy
+
+Before you touch git, know where your work actually lands. A SOW with multiple contributors uses three tiers:
+
+```
+main              ← protected, one PR + approval away from any branch
+ └─ <sow>         ← SOW integration branch, owned by the SOW lead
+     └─ <sow>-<yourname>   ← your own branch, freely commit/push here
+     └─ <sow>-<othername>  ← another contributor's branch
+```
+
+- **`main`**: protected. Nothing merges in without a PR and an approval.
+- **`<sow>`** (the SOW branch): an integration branch, not a personal one. The SOW lead reviews and merges into it. Don't commit here directly.
+- **`<sow>-<yourname>`**: your own branch. Commit and push freely, no PR needed for your own work-in-progress.
+
+The flow: you work on `<sow>-<yourname>` → open a PR into `<sow>` when ready → the SOW lead merges it → periodically the SOW lead PRs `<sow>` into `main`.
+
+You never need to type any of this yourself — `/onboard` and `/github-branch-publish` figure out your branch name from your config and this repo's convention. See [Multi-contributor workflow](#multi-contributor-workflow) for the full model, including the simpler single-lead variant (`sow1`, `sow2`, no per-person sub-branches).
+
 ## Joining an existing brain
 
 Someone already created and configured the repo. You just need to clone it and set up your local config.
@@ -57,6 +76,30 @@ This sets up your local `config.yaml` (name, role) and any SOW directories you'r
 ```
 
 It reads your current state and tells you exactly what to do next — including where to read for context (`stakeholders/client-context.md`, `sows/<sow>/sow-context.md`) and which branch to work on.
+
+**4. See what's on your plate**
+```
+/action-board --owner "Your Name"
+```
+Shows every open `- [ ]` action across the vault attributed to you — pulled from working sessions, meeting summaries, and TLUs.
+
+**5. Ask Claude to work on a task**
+
+Just say *"let's work on <task>"*. Claude creates a slug-based working session under the right SOW (`sows/<sow>/work/<slug>/`) and you go from there — no need to create files by hand.
+
+**6. Save your progress**
+
+When you're ready to check in your work:
+- `/github-commit` — commits your changes, grouped by theme, with no push. Good for saving progress mid-task.
+- `/github-branch-publish` — commits, pushes to your branch, and opens a PR in one shot. You don't need to name a branch or a base — Claude reads your config and this repo's [branching strategy](#branching-strategy) to figure out both (your personal branch as head, the SOW branch as base).
+
+**7. Stay current with the rest of the team**
+
+Other contributors are merging into your SOW branch too — pull their work into yours every so often with:
+```
+/github-branch-refresh
+```
+This merges your SOW branch's latest into whatever branch you're on and pushes straight to your own branch — no PR needed, since it's your branch. Run it before starting a new task, or any time it's been a few days since you last checked in.
 
 See [Multi-contributor workflow](#multi-contributor-workflow) below for the full collaboration model.
 
