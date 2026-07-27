@@ -39,10 +39,10 @@ This repo may have multiple contributors (e.g. two TPMs, each owning a different
 
 **Recommended pattern: long-lived SOW branch per PM**
 
-Each PM owns a persistent branch tied to their SOW (e.g. `sow2/alice`). On that branch they commit and push freely — no PRs, no approvals, no friction. Periodically (end of week, before a TLU, at a milestone) they open a PR from their SOW branch into main, the other PM approves in seconds, and it merges. Everyone pulls main to get each other's updates.
+Each PM owns a persistent branch tied to their SOW (e.g. `sow2-alice`). On that branch they commit and push freely — no PRs, no approvals, no friction. Periodically (end of week, before a TLU, at a milestone) they open a PR from their SOW branch into main, the other PM approves in seconds, and it merges. Everyone pulls main to get each other's updates.
 
 - **Daily**: commit and push freely to your SOW branch
-- **Periodically**: PR from `<sow>/<name>` → main, lightweight approval, merge, pull
+- **Periodically**: PR from `<sow>-<name>` → main, lightweight approval, merge, pull
 
 To keep merges easy, pull main into the SOW branch regularly using merge — never rebase:
 ```bash
@@ -57,15 +57,15 @@ Rebase replays commits and causes conflicts when the same changes already landed
 **If a `git push` to main fails with a GitHub branch protection error**, that's expected. Tell the user:
 > "Main is protected on this repo. Let me set up your SOW branch instead."
 Then:
-1. Create their SOW branch: `git checkout -b <sow>/<name>` (e.g. `sow2/alice`)
-2. Push it: `git push -u origin <sow>/<name>`
+1. Create their SOW branch: `git checkout -b <sow>-<name>` (e.g. `sow2-alice`)
+2. Push it: `git push -u origin <sow>-<name>`
 3. Explain they work here freely and open a PR to main when ready
 
 **Variant: multiple contributors on the same SOW (per-person branch → SOW integration branch → main)**
 
 Some SOWs have more than one person working on them at once (e.g. several non-technical team members contributing meeting notes, task updates, working sessions on the same SOW). In that case, the SOW branch itself becomes an integration branch rather than a single person's working branch, and each contributor gets their own branch off it:
 
-- Naming: `<sow>/<name>` (e.g. `sow2/alice`, `sow2/beatriz`, `sow2/carla`)
+- Naming: `<sow>-<name>` (e.g. `sow2-alice`, `sow2-beatriz`, `sow2-carla`) — a slash (`<sow>/<name>`) can't be used here: git can't have a branch named `<sow>` and a branch named `<sow>/<anything>` at the same time, since branch refs are stored in a path-like tree and `<sow>` can't be both a leaf and a directory.
 - Each person commits and pushes freely to their own branch — no PRs, no friction, and they never need to touch git directly; they just ask Claude to "commit and push."
 - When someone wants their work merged in, they (via Claude) open a PR from their branch into the SOW integration branch (`<sow>`), not into `main`.
 - The SOW owner reviews and merges that PR into `<sow>`.
@@ -74,7 +74,7 @@ Some SOWs have more than one person working on them at once (e.g. several non-te
 Before committing on behalf of a user in this setup, Claude must confirm which branch it's on and whose branch it should be:
 - Run `git branch --show-current`. If it's `main`, the SOW integration branch (e.g. `<sow>`), or clearly someone else's branch, stop and ask before committing — never assume it's safe to commit to a shared or another person's branch.
 - If the user hasn't identified themselves yet this session, resolve that first (see "Who are you?" below) — their name determines which per-person branch to check out or create.
-- If their branch (`<sow>/<name>`) doesn't exist yet, create it off the current SOW integration branch and push it, same as the single-PM setup above.
+- If their branch (`<sow>-<name>`) doesn't exist yet, create it off the current SOW integration branch and push it, same as the single-PM setup above.
 - When they ask to "merge into `<sow>`" or similar, that means: open a PR from their personal branch into the SOW integration branch — Claude should use `gh pr create` with the base branch set explicitly, not assume `main`.
 
 **Why this model:** SOW directories are non-overlapping so merge conflicts are rare. PRs to main are not code reviews — they're lightweight async status updates. The diff is markdown: meeting summaries, TLU drafts, stakeholder notes. It tells a story. The other lead sees exactly who you met with, what's blocked, what the client is worried about — without a single Slack message or sync meeting.
