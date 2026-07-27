@@ -175,10 +175,19 @@ TLUs are weekly status updates — typically for the Sales Lead or engagement sp
 - Status color: 🟢 Green (on track), 🟡 Yellow (at-risk items or open blockers), 🔴 Red (engagement in jeopardy)
 - Audience: executive frame — risks, status, CTAs. No implementation jargon.
 
-**When the user says "generate a TLU" or "generate this week's TLU":**
-1. Read all meeting summaries, working session notes, and the SOW reference for current deliverables and blockers
-2. Fill the template — achievements, blockers (with CTAs + due dates), risks (with mitigations), key notes
-3. Save to the TLUs directory for that SOW
+**When the user says "generate a TLU" or "generate this week's TLU":** run `/tlu <sow>`.
+
+**Daily TLUs** — a same-day delta report showing what's moved since the last check, meant to be run multiple times a day as a progress pulse-check. Run `/tlu-daily <sow>`. Template: `templates/tlu-daily.md`.
+
+---
+
+## Jira Ticket Tracking
+
+For SOWs that need Jira-derived status in their TLUs:
+- `/jira-onboard <sow>` — one-time setup: picks the Jira MCP server, project key, team roster, and JQL query, then writes `sows/<sow>/work/jira-status/CLAUDE.md`
+- `/jira-overview <sow>` — refreshes a dated ticket-overview snapshot (status, days-in-status, Slack-ready Executive Summary) under `sows/<sow>/work/ticket-overview/`
+
+`/tlu` and `/tlu-daily` check for a recent ticket-overview snapshot and ask before running `/jira-overview` themselves — it's never triggered automatically.
 
 ---
 

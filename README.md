@@ -100,6 +100,15 @@ All commands run from the repo root in a Claude Code session (`claude`).
 | `/meeting-recap` | Picks up new Gemini meeting notes from Drive since last run. Incremental — only processes what's new. |
 | `/meeting-recap --keywords <words>` | Search for specific keywords in recent meetings. |
 | `/meeting-recap --date <date>` | Fetch meetings from a specific date. |
+| `/tlu <sow>` | Generates this week's Traffic Light Update, pulling from meeting summaries, working sessions, and (if available) the latest Jira ticket-overview snapshot. |
+| `/tlu-daily <sow>` | Generates a same-day delta report — what's moved since the last check. Meant to be run multiple times a day. |
+
+### Jira
+
+| Command | When to run | What it does |
+|---------|------------|--------------|
+| `/jira-onboard [sow]` | Once per SOW | Sets up Jira status tracking — picks the MCP server, project key, team roster, and JQL query, then writes `sows/<sow>/work/jira-status/CLAUDE.md`. |
+| `/jira-overview [sow]` | As needed, or when `/tlu`/`/tlu-daily` ask for it | Refreshes a dated ticket-overview snapshot: status, days-in-status, what's new, and a Slack-ready Executive Summary. |
 
 ### Notion
 
@@ -125,7 +134,7 @@ All commands run from the repo root in a Claude Code session (`claude`).
 
 **Start a working session** → say *"I need to work on [topic]"* — Claude creates a slug-based session under your SOW
 
-**Generate a TLU** → say *"generate this week's TLU"* — Claude pulls from working sessions and meeting notes
+**Generate a TLU** → run `/tlu <sow>` — Claude pulls from working sessions, meeting notes, and Jira status
 
 **Track a stakeholder** → copy `stakeholders/_example/`, fill in `profile.md`
 
