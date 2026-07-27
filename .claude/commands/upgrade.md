@@ -69,6 +69,7 @@ Files to update:
 - `.claude/commands/onboard.md`
 - `.claude/commands/bootstrap.md`
 - `.claude/commands/meeting-recap.md`
+- `.claude/commands/meeting-recap-drive.md`
 - `.claude/commands/publish-to-notion.md`
 - `.claude/commands/fetch-from-notion.md`
 - `.claude/commands/sync-tasks.md`

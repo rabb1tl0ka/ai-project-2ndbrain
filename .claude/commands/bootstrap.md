@@ -19,7 +19,7 @@ Use this to add a new SOW to an already-bootstrapped brain, or to refresh a sing
 1. **If `--sow <name>` was passed:**
    - If `sows/<name>/` does NOT exist: run the **New SOW setup** flow below, then jump straight to processing that SOW.
    - If `sows/<name>/` exists: check whether it has already been bootstrapped by counting `.md` files in `sows/<name>/meeting-summaries/` and checking if `sows/<name>/slack-context.md` exists. If either has content, warn:
-     > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
+     > "sow2 looks already bootstrapped (N meeting summaries, slack context ✓). Re-running will re-fetch everything from Drive and Slack — use `/meeting-recap` (or `/meeting-recap-drive` if this SOW's notes still live in a Drive folder) instead to pick up new meetings cheaply. Re-run full bootstrap anyway? [y/N]"
      Stop if declined. Otherwise continue to **For each SOW**, processing only `<name>`.
 
 2. **If no `--sow` flag:** discover all SOW directories in `sows/` excluding `_template`.
@@ -389,7 +389,7 @@ Check across all SOWs for issues that span engagement-wide:
 
    This is the branch everyone on this SOW works from — no PRs needed for day-to-day commits. PRs only go from `<sow>` → `main`.
 
-2. Update `.meeting-recap-state.md` `last_ran` to today — future `/meeting-recap` runs only pick up new meetings.
+2. If this SOW's meetings were pulled via `DRIVE_FOLDERS`/`GEMINI_NOTES_DOCS` (this bootstrap step uses the same Drive-based discovery as `/meeting-recap-drive`), update `.meeting-recap-drive-state.md` `last_ran` to today — future `/meeting-recap-drive` runs only pick up new meetings. This doesn't seed `/meeting-recap`'s Calendar-based state — that skill tracks its own processed events independently and will pick up any Calendar-attached meetings on its own next run.
 
 3. Update `.bootstrap-state.md`:
 

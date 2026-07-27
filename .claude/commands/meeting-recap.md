@@ -1,4 +1,6 @@
-Process Gemini meeting notes from Google Drive into structured meeting summaries for this project.
+Process Gemini meeting notes for this project, discovered via Google Calendar events.
+
+For projects that predate this brain (or where notes get manually copied into a shared Drive folder instead), use `/meeting-recap-drive` instead — see that command for when to reach for it.
 
 ## Pre-flight
 
@@ -7,15 +9,38 @@ Process Gemini meeting notes from Google Drive into structured meeting summaries
    - If only one SOW exists, use it.
    - If multiple SOWs exist, ask: "Which SOW are you recapping meetings for? [list options]"
 
-2. Read `sows/<sow>/sow.config.yaml`. Extract `DRIVE_FOLDERS` and `MEETING_FILTER`. If `DRIVE_FOLDERS` is empty, ask:
-   > "No Drive folder configured for [sow]. Paste one or more Google Drive folder URLs (comma-separated) for the meeting notes."
+2. Read `sows/<sow>/sow.config.yaml`. Extract `MEETING_TITLE_FILTER`, `CALENDAR_ID`, `LOOKBACK_DAYS`.
+   - If `MEETING_TITLE_FILTER` is missing, but the old single-value `MEETING_FILTER` field is set, treat it as a one-item list — don't error or ask the user to migrate it.
+   - If neither is set, ask: "What string(s) should I match in Google Calendar event titles to find [sow]'s meetings? (comma-separated if more than one, e.g. 'AI Design Cards Digital, Design Sprint')" — split on commas, trim whitespace, write as a list under `MEETING_TITLE_FILTER` in `sow.config.yaml`.
 
 ## Configuration
 
-- **Drive folder**: DRIVE_FOLDERS (read from `sows/<sow>/sow.config.yaml`)
-- **Meeting filter**: MEETING_FILTER (read from `sows/<sow>/sow.config.yaml` — optional, applied when set)
-- **State file**: `.meeting-recap-state.md` (repo root)
+- **Title filter**: `MEETING_TITLE_FILTER` — list of strings, OR logic, case-insensitive substring match against the event title. An event matches if its title contains **any** entry.
+- **Calendar**: `CALENDAR_ID` (optional, defaults to `primary`)
+- **Lookback window**: `LOOKBACK_DAYS` (optional, defaults to 14) — bounds the Calendar search each run. It exists purely to bound the query, not to dedupe — that's the state file's job.
+- **State file**: `sows/<sow>/.meeting-recap-state.md`
 - **Summary template**: `templates/meeting-summary.md`
+
+### State file — per-event tracking, not a date cursor
+
+A date cursor can't handle multiple same-day meetings where some are already processed and others aren't. `sows/<sow>/.meeting-recap-state.md` tracks **which specific calendar events have been handled**:
+
+```markdown
+## Processed events
+- id: 1vq77pagc28rqs1te3s9n7e2f4
+  date: 2026-07-26
+  title: "AI Design Cards Digital - Weekly Sprint Start/Review"
+  status: done
+- id: abc123xyz
+  date: 2026-07-24
+  title: "AI Design Cards Digital - Kickoff"
+  status: skipped
+```
+
+- `status: done` — meeting summary already saved for this event, never reprocess it.
+- `status: skipped` — Gemini notes weren't ready last time this event was checked; retry it.
+- Create the file (empty `## Processed events` list) if missing. If an old `last_ran: YYYY-MM-DD` file exists from a previous version of this skill, treat it as an empty processed-events list — don't error, don't try to migrate it, just start tracking events fresh from here.
+- Events stay in the list indefinitely (bounded naturally by `LOOKBACK_DAYS` — an event that ages out of the search window stops being re-checked anyway, so the list doesn't need separate pruning).
 
 ## Gemini filename convention
 
@@ -29,40 +54,41 @@ Example: `CS GCP Cost Optimization - 2026/05/28 14:22 WEST - Notes by Gemini`
 
 ### Default — `/meeting-recap`
 
-1. Read `.meeting-recap-state.md` for `last_ran`. If missing or empty, default to 7 days ago.
-2. Parse `DRIVE_FOLDERS` as comma-separated URLs. For each folder, extract the folder ID (last segment after `/folders/`).
-3. Search each folder for files modified after `last_ran`. Deduplicate across folders by file ID. If `MEETING_FILTER` is set, only include files whose names contain that string.
-4. Process each match (see **Processing** below).
-5. Report: "Processed N meetings since <last_ran>." If MEETING_FILTER was applied, note it: "(filtered by '<MEETING_FILTER>')"
-6. Update `last_ran` in `.meeting-recap-state.md` to today's date.
+1. Read the processed-events list from `sows/<sow>/.meeting-recap-state.md`.
+2. Search Google Calendar (`CALENDAR_ID`) for events whose title contains any entry in `MEETING_TITLE_FILTER`, within the last `LOOKBACK_DAYS` days up to now.
+3. For each matching event, check it against the processed-events list:
+   - `status: done` → already handled, skip silently.
+   - `status: skipped` or not in the list at all (new event) → attempt to process it this run.
+4. If nothing needs attempting, report that and stop.
+5. Process each event that needs attempting (see **Processing** below). An event whose Gemini doc isn't attached yet (notes not ready) is **skipped, not an error** — note its date and move on.
+6. After each event, upsert its record in the processed-events list: `status: done` on success, `status: skipped` if notes weren't ready.
+7. Report: "Processed N meetings." List any skipped events (title + date) — they'll be retried automatically next run.
 
-### Keywords — `/meeting-recap --keywords {words}`
+### `--date {date}`
 
-1. Read `.meeting-recap-state.md` for `last_ran`. If missing, default to 7 days ago.
-2. Search the folder for files whose names contain the given keywords, modified after `last_ran`.
-3. Process each match.
-4. **Do NOT update `last_ran`.**
-
-### Date — `/meeting-recap --date {date}`
-
-1. Search the folder for all files modified on that specific date.
-2. Present the list and ask which ones to process.
-3. Process selected matches.
-4. **Do NOT update `last_ran`.**
+1. Search Calendar for title-matching events on that exact date (ignoring `LOOKBACK_DAYS`).
+2. If more than one matches, list them and ask which to process.
+3. Process selected matches — this mode **does** consult and update the processed-events list, same dedup rules as default, so re-running it doesn't reprocess an event already marked `done`.
 
 ---
 
-## Processing a Gemini note
+## Processing one event
 
-For each file:
+### 1 — Locate the Gemini doc
 
-1. Read the file using Google Drive MCP.
+Pull it from the calendar event's own `attachments` — find the entry titled "Notes by Gemini" and take its `fileUrl`, extracting the Drive doc ID from it. Don't derive the filename and search Drive separately; the event already carries a direct link.
+
+If no such attachment exists yet, the notes likely aren't ready (Gemini can take a while, or the meeting wasn't transcribed) — record the event as **skipped** and continue to the next matching event.
+
+### 2 — Read and extract
+
+1. Read the doc via Google Drive MCP.
 2. Extract the following from the Gemini structure:
 
    | Template field | Source in Gemini note |
    |---|---|
    | `attendees` | "Invited" list at the top |
-   | `date` | Date from filename |
+   | `date` | Calendar event's start date |
    | `type` | Infer: internal if all @loka.com, client if external attendees |
    | **Key Takeaways** | Narrative paragraphs in the "Summary" section |
    | **Decisions Made** | Bullets under "Decisions > ALIGNED" |
@@ -129,15 +155,3 @@ After all meetings are processed, review the task board and propose updates base
 - `Due`: date if stated, otherwise empty
 - `Session`: slug of the working session this came from, or the meeting slug if no working session applies
 - `Status`: `open` or `blocked`
-
----
-
-## State file format
-
-`.meeting-recap-state.md` contains a single line:
-
-```
-last_ran: YYYY-MM-DD
-```
-
-Create it if it doesn't exist. Update `last_ran` only when the default mode completes successfully.

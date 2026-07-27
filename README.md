@@ -97,9 +97,11 @@ All commands run from the repo root in a Claude Code session (`claude`).
 | Command | What it does |
 |---------|-------------|
 | `/2ndbrain` | Orientation — shows current setup state, SOW summary, and notifies if a template update is available. |
-| `/meeting-recap` | Picks up new Gemini meeting notes from Drive since last run. Incremental — only processes what's new. |
-| `/meeting-recap --keywords <words>` | Search for specific keywords in recent meetings. |
+| `/meeting-recap` | Picks up new meetings via Google Calendar (matched by title) and pulls each one's attached Gemini notes. Incremental — tracks processed events, only handles what's new. |
 | `/meeting-recap --date <date>` | Fetch meetings from a specific date. |
+| `/meeting-recap-drive` | Same output, but discovers Gemini notes from a Drive folder instead of Calendar. Use for backfilling engagements that predate this brain, or when notes are manually copied into a shared folder. |
+| `/meeting-recap-drive --keywords <words>` | Search for specific keywords in recent meetings (Drive variant). |
+| `/meeting-recap-drive --date <date>` | Fetch meetings from a specific date (Drive variant). |
 | `/tlu <sow>` | Generates this week's Traffic Light Update, pulling from meeting summaries, working sessions, and (if available) the latest Jira ticket-overview snapshot. |
 | `/tlu-daily <sow>` | Generates a same-day delta report — what's moved since the last check. Meant to be run multiple times a day. |
 

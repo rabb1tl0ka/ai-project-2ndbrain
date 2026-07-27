@@ -1,4 +1,6 @@
 .DS_Store
 .meeting-recap-state.md
+.meeting-recap-drive-state.md
+sows/*/.meeting-recap-state.md
 .obsidian/
-.kernel/repos.txt
+.kernel/template-upgrade-repos.yaml

@@ -9,14 +9,28 @@ ENGAGEMENT_TYPE: ""
 ENGAGEMENT_CONTEXT: ""
 
 
-# Google Drive folder URL(s) containing Gemini meeting notes for this SOW
+# Used by /meeting-recap (default, Calendar-first). List of string(s) to match against Google
+# Calendar event titles for this SOW's meetings — OR logic, case-insensitive substring match.
+# Example: MEETING_TITLE_FILTER: ["ZenQMS", "ZenQMS Weekly Sync"]
+MEETING_TITLE_FILTER: []
+
+# (Optional) Calendar to search for /meeting-recap. Defaults to "primary" — only set this if
+# meetings for this SOW live on a different calendar.
+CALENDAR_ID: ""
+
+# (Optional) How many days back /meeting-recap searches Calendar each run. Defaults to 14.
+# Just bounds the search query — dedup is handled by the state file, not this.
+LOOKBACK_DAYS: ""
+
+# Used by /meeting-recap-drive (backfill / folder-based workflows). Google Drive folder URL(s)
+# containing Gemini meeting notes for this SOW.
 # Comma-separated — add multiple folders if client and internal notes live in separate places
 # Example: "https://drive.google.com/drive/folders/abc, https://drive.google.com/drive/folders/xyz"
 DRIVE_FOLDERS: ""
 
-# Filename filter for meeting notes (optional but required when any DRIVE_FOLDERS entry is a shared
-# folder like My Drive > Meet Recordings rather than a SOW-specific folder).
-# Only files whose names contain this string will be processed across all folders.
+# Used by /meeting-recap-drive. Filename filter for meeting notes (optional but required when any
+# DRIVE_FOLDERS entry is a shared folder like My Drive > Meet Recordings rather than a SOW-specific
+# folder). Only files whose names contain this string will be processed across all folders.
 # Example: "ZenQMS", "ZenQMS SOW4", "CS " (note trailing space to avoid matching "CSS")
 MEETING_FILTER: ""
 

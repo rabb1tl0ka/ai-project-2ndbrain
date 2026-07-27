@@ -214,12 +214,12 @@ When logging a meeting or interaction, look up who was in the room and let their
 
 ## Meeting Summaries
 
-Meeting notes for this project live in Google Drive as Gemini notes. Filenames follow this convention:
+Meeting notes for this project are Gemini notes. Filenames follow this convention:
 `{meeting title} - {YYYY/MM/DD HH:MM TZ} - Notes by Gemini`
 
-Each SOW has its own Drive folder and Slack channels, configured in `sows/<sow>/sow.config.yaml`.
+Each SOW has its own Calendar meeting-title filter (or Drive folder) and Slack channels, configured in `sows/<sow>/sow.config.yaml`.
 
-Use `/bootstrap` once to load all historical meetings into the vault. After that, use `/meeting-recap` for new meetings as they happen — it picks up only what's changed since the last run.
+Use `/bootstrap` once to load all historical meetings into the vault. After that, use `/meeting-recap` for new meetings as they happen — it finds them via Calendar (matched by title) and pulls each event's attached Gemini notes, tracking which events are already processed. If this engagement predates the brain, or notes get manually copied into a shared Drive folder rather than staying attached to Calendar invites, use `/meeting-recap-drive` instead — it discovers notes by scanning a configured Drive folder.
 
 To manually log a meeting (e.g. from a paste or a file you already have open):
 1. Identify the SOW

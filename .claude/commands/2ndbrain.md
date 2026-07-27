@@ -30,7 +30,8 @@ Two commands set up your brain. Run them once, in order.
                          history into the vault.
 
 After setup, use these ongoing:
-  /meeting-recap       ← pick up new meetings since last run
+  /meeting-recap       ← pick up new meetings via Calendar since last run
+  /meeting-recap-drive ← same, but via a Drive folder (backfill / pre-brain history)
   /bootstrap --sow     ← add a new SOW to an already-bootstrapped brain
 ```
 
