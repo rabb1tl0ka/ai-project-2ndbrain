@@ -22,8 +22,47 @@ config.yaml          ← your engagement config, gitignored — never committed
 ## Setup
 
 > **Are you the engagement owner setting this up for the first time, or a contributor joining an existing brain?**
-> - **Owner:** follow steps 1–6 below
-> - **Contributor:** skip to [Joining an existing brain](#joining-an-existing-brain)
+> - **Contributor:** the brain is already bootstrapped — see [Joining an existing brain](#joining-an-existing-brain) just below
+> - **Owner:** setting this up for the first time — follow [Creating a new brain](#creating-a-new-brain)
+
+## Joining an existing brain
+
+Someone already created and configured the repo. You just need to clone it and set up your local config.
+
+**1. Clone the repo**
+```bash
+git clone https://github.com/<your-org>/<client>-ai-2ndbrain
+cd <client>-ai-2ndbrain
+```
+
+**2. Run `/onboard`**
+
+Start Claude Code from the repo root:
+```bash
+claude
+```
+
+Then run:
+```
+/onboard
+```
+
+This sets up your local `config.yaml` (name, role) and any SOW directories you're contributing to. It detects the existing engagement config and only asks for what's missing.
+
+`config.yaml` is gitignored — it never gets committed.
+
+**3. Orient yourself**
+```
+/2ndbrain
+```
+
+It reads your current state and tells you exactly what to do next — including where to read for context (`stakeholders/client-context.md`, `sows/<sow>/sow-context.md`) and which branch to work on.
+
+See [Multi-contributor workflow](#multi-contributor-workflow) below for the full collaboration model.
+
+---
+
+## Creating a new brain
 
 **1. Create a repo from this template**
 
@@ -69,7 +108,7 @@ Main is protected — don't push directly to it. Each SOW lead owns a dedicated 
 
 ```bash
 git checkout -b sow1          # if you're the SOW lead
-git checkout -b sow1/yourname # if you're a contributor to someone else's SOW
+git checkout -b sow1-yourname # if you're a contributor to someone else's SOW
 git add -A && git commit -m "init: configure engagement brain"
 git push -u origin HEAD
 ```
@@ -104,6 +143,7 @@ All commands run from the repo root in a Claude Code session (`claude`).
 | `/meeting-recap-drive --date <date>` | Fetch meetings from a specific date (Drive variant). |
 | `/tlu <sow>` | Generates this week's Traffic Light Update, pulling from meeting summaries, working sessions, and (if available) the latest Jira ticket-overview snapshot. |
 | `/tlu-daily <sow>` | Generates a same-day delta report — what's moved since the last check. Meant to be run multiple times a day. |
+| `/action-board [path] [--all\|--overdue] [--owner <name>]` | Scans for `## Actions` checkbox sections across the vault and prints a consolidated, prioritized board of open items. Also triggers on phrases like "what's on my plate". |
 
 ### Jira
 
@@ -118,6 +158,13 @@ All commands run from the repo root in a Claude Code session (`claude`).
 |---------|-------------|
 | `/publish-to-notion <file>` | Publishes any vault `.md` file to Notion as a child page of the SOW's project page. Idempotent — republishing updates the existing page. |
 | `/fetch-from-notion [sow]` | Pulls all child pages from the Notion project page, traverses TLU history chains, writes `notion-context.md`. |
+
+### Git workflow
+
+| Command | What it does |
+|---------|-------------|
+| `/github-commit` | Groups your working tree's changes by theme and proposes one commit per group. Never pushes — commit only, after you approve the full plan. |
+| `/github-branch-publish [branch] [--base <branch>]` | Same grouped-commit flow, then pushes to a branch and opens a PR — commit to PR in one shot. Defaults to your own branch per this repo's naming convention (see [Multi-contributor workflow](#multi-contributor-workflow)) if none is given. |
 
 ### Maintenance
 
@@ -141,29 +188,6 @@ All commands run from the repo root in a Claude Code session (`claude`).
 **Track a stakeholder** → copy `stakeholders/_example/`, fill in `profile.md`
 
 **Log a meeting** → ask Claude: *"log this meeting summary"* — saves to the right SOW
-
-## Joining an existing brain
-
-Someone already created and configured the repo. You just need to clone it and set up your local config.
-
-**1. Clone the repo**
-```bash
-git clone https://github.com/<your-org>/<client>-ai-2ndbrain
-cd <client>-ai-2ndbrain
-```
-
-**2. Run `/onboard`**
-
-This sets up your local `config.yaml` (name, role) and any SOW directories you're contributing to. It detects the existing engagement config and only asks for what's missing.
-
-`config.yaml` is gitignored — it never gets committed.
-
-**3. Orient yourself**
-```
-/2ndbrain
-```
-
----
 
 ## Multi-contributor workflow
 
@@ -225,4 +249,4 @@ To start a new SOW: copy `sows/_template/` and rename it. Or run `/bootstrap --s
 - A markdown editor — [Obsidian](https://obsidian.md) recommended (any editor works)
 - Google Drive and Slack connected in Claude Code (for `/bootstrap`)
 - Notion connected in Claude Code (optional — for `/publish-to-notion` and `/fetch-from-notion`)
-- SSH access to [`github.com/rabb1tl0ka/claude-skills`](https://github.com/rabb1tl0ka/claude-skills) (optional — `/bootstrap` pulls the `action-board` skill from there on first run; without access, `/bootstrap` still completes, it just skips that step and `/action-board` won't be available until someone copies it in manually)
+- Network access to [`github.com/rabb1tl0ka/claude-skills`](https://github.com/rabb1tl0ka/claude-skills) (optional — `/bootstrap` pulls the `action-board`, `github-commit`, and `github-branch-publish` skills from there on first run; if the clone fails, `/bootstrap` still completes, it just skips that step and those skills won't be available until someone copies them in manually)
