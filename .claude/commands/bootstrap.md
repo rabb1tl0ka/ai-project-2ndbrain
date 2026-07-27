@@ -373,18 +373,24 @@ Check across all SOWs for issues that span engagement-wide:
 
 ## Wrap up
 
-1. **Ensure the `action-board` skill is available.**
+1. **Ensure the standard skills are available.**
 
-   Check whether `.claude/skills/action-board/SKILL.md` already exists in this repo. If it does, skip this step silently.
+   For each skill below, check whether `.claude/skills/<skill>/SKILL.md` already exists in this repo. If it does, skip that skill silently.
 
-   Otherwise, pull it in from its source repo so every contributor gets `/action-board` (consolidated open-actions board across meeting summaries and working sessions) automatically on clone, with no separate global install needed:
+   - `action-board` — consolidated open-actions board across meeting summaries and working sessions
+   - `github-commit` — grouped, approved commits from the working tree
+   - `github-branch-publish` — commit, push, and open a PR in one shot
+
+   Pull in whichever of these are missing from their source repo, so every contributor gets them automatically on clone, with no separate global install needed:
    ```bash
-   git clone --depth 1 git@github.com:rabb1tl0ka/claude-skills.git /tmp/claude-skills-bootstrap
+   git clone --depth 1 https://github.com/rabb1tl0ka/claude-skills.git /tmp/claude-skills-bootstrap
    mkdir -p .claude/skills
-   cp -r /tmp/claude-skills-bootstrap/action-board .claude/skills/action-board
+   cp -r /tmp/claude-skills-bootstrap/action-board .claude/skills/action-board          # if missing
+   cp -r /tmp/claude-skills-bootstrap/github-commit .claude/skills/github-commit        # if missing
+   cp -r /tmp/claude-skills-bootstrap/github-branch-publish .claude/skills/github-branch-publish  # if missing
    rm -rf /tmp/claude-skills-bootstrap
    ```
-   If the clone fails (no access, no network), note it and continue — the brain still works, `/action-board` just won't be available until someone copies it in manually. This is a one-time step; it won't re-run once the skill is present, so it never overwrites local edits to it.
+   If the clone fails (no network), note it and continue — the brain still works, these skills just won't be available until someone copies them in manually. This is a one-time step per skill; it won't re-copy a skill that's already present, so it never overwrites local edits to it.
 
 2. **Create SOW branch(es) if missing.**
 
