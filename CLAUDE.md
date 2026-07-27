@@ -31,7 +31,7 @@ Run `git pull` before starting any session to make sure you're on the latest ver
 
 If this is the very first session and the vault hasn't been loaded yet, run `/bootstrap` — it pulls the SOW, meeting notes, and Slack history into the vault so Claude has real project context from the start.
 
-Read `stakeholders/client-context.md` for the engagement-wide view. For each SOW being worked on this session, read `sows/<sow>/sow-context.md` for current status and open items. The SOW's `CLAUDE.md` loads automatically — it has task board rules and session start instructions.
+Read `stakeholders/client-context.md` for the engagement-wide view. For each SOW being worked on this session, read `sows/<sow>/sow-context.md` for current status and open items. `sows/<sow>/CLAUDE.md` loads automatically — it has task board rules and session start instructions.
 
 ## Collaboration Model
 

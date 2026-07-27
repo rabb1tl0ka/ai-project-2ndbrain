@@ -74,6 +74,10 @@ Files to update:
 - `.claude/commands/publish-to-notion.md`
 - `.claude/commands/fetch-from-notion.md`
 - `.claude/commands/sync-tasks.md`
+- `.claude/commands/jira-onboard.md`
+- `.claude/commands/jira-overview.md`
+- `.claude/commands/tlu.md`
+- `.claude/commands/tlu-daily.md`
 - `.claude/commands/upgrade.md`
 - `config.example.yaml`
 - `README.md`

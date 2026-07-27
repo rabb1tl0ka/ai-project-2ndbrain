@@ -426,8 +426,14 @@ def test_upgrade_covers_all_commands():
     repo = Path(__file__).parent.parent
     upgrade_content = (repo / ".claude/commands/upgrade.md").read_text()
 
+    # Maintainer-only commands never ship to client vaults, so /upgrade
+    # intentionally doesn't list them among the files it copies.
+    maintainer_only = {"template-commit-n-release.md", "template-upgrade-repos.md"}
+
     commands_dir = repo / ".claude/commands"
     for cmd_file in sorted(commands_dir.glob("*.md")):
+        if cmd_file.name in maintainer_only:
+            continue
         rel = f".claude/commands/{cmd_file.name}"
         if rel in upgrade_content:
             ok(f"{rel} listed in /upgrade's file list")
