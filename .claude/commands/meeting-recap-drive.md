@@ -68,7 +68,7 @@ For each file:
    | `type` | Infer: internal if all @loka.com, client if external attendees |
    | **Key Takeaways** | Narrative paragraphs in the "Summary" section |
    | **Decisions Made** | Bullets under "Decisions > ALIGNED" |
-   | **Action Items table** | "Next steps" — owner from `[Name]` prefix, due date blank unless stated |
+   | **Actions checkboxes** | "Next steps" — one `- [ ] task (owner: name) (due: yyyy-MM-dd)` per item; owner from `[Name]` prefix, omit the `(due: ...)` tag entirely unless an exact yyyy-MM-dd date is stated |
    | **Notes** | Bullets under "Decisions > NEEDS FURTHER DISCUSSION" flagged as open items |
 
 3. If `--details` is passed alongside any mode, also append the "Details" section content to Notes (timestamped bullets, verbatim).

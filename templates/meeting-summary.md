@@ -13,11 +13,8 @@ type: internal | client | stakeholder
 ## Decisions Made
 -
 
-## Action Items
-
-| Action | Owner | Due |
-|--------|-------|-----|
-| ... | ... | ... |
+## Actions
+- [ ] ... (owner: ...) (due: yyyy-MM-dd)
 
 ## Notes
 

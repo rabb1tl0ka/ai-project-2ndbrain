@@ -152,7 +152,7 @@ If no meetings found, note it and continue.
    | `type` | Internal if all @loka.com; client if any external attendees |
    | **Key Takeaways** | Narrative paragraphs in "Summary" |
    | **Decisions Made** | Bullets under "Decisions > ALIGNED" |
-   | **Action Items** | "Next steps" — owner from `[Name]` prefix, due date if stated |
+   | **Actions checkboxes** | "Next steps" — one `- [ ] task (owner: name) (due: yyyy-MM-dd)` per item; owner from `[Name]` prefix, omit the `(due: ...)` tag entirely unless an exact yyyy-MM-dd date is stated |
    | **Open Items** | Bullets under "Decisions > NEEDS FURTHER DISCUSSION" |
 
 3. Build slug from meeting title: lowercase, kebab-case.
