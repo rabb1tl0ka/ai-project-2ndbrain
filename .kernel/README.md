@@ -13,6 +13,8 @@ This directory contains internal tooling for the `ai-project-2ndbrain` template 
 | `.2ndbrain-version` | Current template version stamp |
 | `.roadmap-version` | Roadmap format version stamp |
 
+When you change something in this template repo, use `/template-commit-n-release` (see `.claude/commands/template-commit-n-release.md`) instead of committing and pushing by hand — it groups the diff into approved commits, pushes, then walks through `release.sh` so the change is never left committed-but-unreleased (which would leave `/template-upgrade-repos` diffing against a stale tag).
+
 Pushing tooling updates out to client repos is done with `/template-upgrade-repos` (see `.claude/commands/template-upgrade-repos.md`), run from a Claude Code session in this repo. It replaced the old `upgrade.sh`/`upgrade-all.sh` scripts, which did a blind file copy and could silently overwrite client-specific customizations (a custom `.gitignore` entry, an onboarding-filled placeholder inside a copied command file). The command diffs before touching anything and asks before overwriting anything it can't safely reconcile on its own.
 
 If you forked this repo for a client engagement: nothing here is for you.
