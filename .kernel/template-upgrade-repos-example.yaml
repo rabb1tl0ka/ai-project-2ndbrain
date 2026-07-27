@@ -1,0 +1,5 @@
+# Repos to upgrade via /template-upgrade-repos. ~ is supported.
+# Copy this file to template-upgrade-repos.yaml (gitignored) and fill in your repos.
+repos:
+  - ~/loka/projects/client-x-2ndbrain
+  - ~/loka/projects/client-y-2ndbrain
