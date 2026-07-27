@@ -375,22 +375,17 @@ Check across all SOWs for issues that span engagement-wide:
 
 1. **Ensure the standard skills are available.**
 
-   For each skill below, check whether `.claude/skills/<skill>/SKILL.md` already exists in this repo. If it does, skip that skill silently.
+   `github-commit`, `github-branch-publish`, and `github-branch-refresh` are bundled in `.claude/skills/` as part of this template — every fork already has them at clone time, nothing to do here.
 
-   - `action-board` — consolidated open-actions board across meeting summaries and working sessions
-   - `github-commit` — grouped, approved commits from the working tree
-   - `github-branch-publish` — commit, push, and open a PR in one shot
+   `action-board` is not bundled — it's pulled from a separate skills repo. Check whether `.claude/skills/action-board/SKILL.md` already exists in this repo. If it does, skip silently.
 
-   Pull in whichever of these are missing from their source repo, so every contributor gets them automatically on clone, with no separate global install needed:
    ```bash
    git clone --depth 1 https://github.com/rabb1tl0ka/claude-skills.git /tmp/claude-skills-bootstrap
    mkdir -p .claude/skills
    cp -r /tmp/claude-skills-bootstrap/action-board .claude/skills/action-board          # if missing
-   cp -r /tmp/claude-skills-bootstrap/github-commit .claude/skills/github-commit        # if missing
-   cp -r /tmp/claude-skills-bootstrap/github-branch-publish .claude/skills/github-branch-publish  # if missing
    rm -rf /tmp/claude-skills-bootstrap
    ```
-   If the clone fails (no network), note it and continue — the brain still works, these skills just won't be available until someone copies them in manually. This is a one-time step per skill; it won't re-copy a skill that's already present, so it never overwrites local edits to it.
+   If the clone fails (no network), note it and continue — the brain still works, `action-board` just won't be available until someone copies it in manually. This is a one-time step; it won't re-copy the skill if it's already present, so it never overwrites local edits to it.
 
 2. **Create SOW branch(es) if missing.**
 
@@ -423,6 +418,7 @@ sows_processed: <comma-separated list>
 Bootstrap complete.
 
 ✓  action-board skill   → .claude/skills/action-board/  (or "already present" / "skipped — clone failed")
+✓  github-commit, github-branch-publish, github-branch-refresh skills → bundled with template
 
 <for each SOW>
 ✓  [sow] SOW doc        → sows/<sow>/<sow>-reference.md

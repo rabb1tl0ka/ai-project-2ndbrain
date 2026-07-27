@@ -276,14 +276,14 @@ def test_sync_tasks_config_and_skill():
 # ─── /sync-tasks folder backfill (upgrade.sh) ─────────────────────────────────
 
 def test_upgrade_backfills_task_board_folder_id():
-    section("upgrade.sh backfills TASK_BOARD_FOLDER_ID")
+    section("template-upgrade-repos backfills TASK_BOARD_FOLDER_ID")
     repo = Path(__file__).parent.parent
 
-    upgrade_content = (repo / ".kernel/upgrade.sh").read_text()
-    if "TASK_BOARD_FOLDER_ID" in upgrade_content and "BACKFILLED_CONFIGS" in upgrade_content:
-        ok("upgrade.sh contains TASK_BOARD_FOLDER_ID backfill logic")
+    upgrade_content = (repo / ".claude/commands/template-upgrade-repos.md").read_text()
+    if "TASK_BOARD_FOLDER_ID" in upgrade_content:
+        ok("template-upgrade-repos.md documents TASK_BOARD_FOLDER_ID backfill logic")
     else:
-        fail("upgrade.sh contains TASK_BOARD_FOLDER_ID backfill logic")
+        fail("template-upgrade-repos.md documents TASK_BOARD_FOLDER_ID backfill logic")
         return
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -435,6 +435,39 @@ def test_upgrade_covers_all_commands():
             fail(f"{rel} listed in /upgrade's file list")
 
 
+# ─── Bundled skills ───────────────────────────────────────────────────────────
+
+def test_bundled_skills():
+    section("Bundled skills")
+    repo = Path(__file__).parent.parent
+
+    for skill in ["github-commit", "github-branch-publish", "github-branch-refresh"]:
+        skill_path = repo / f".claude/skills/{skill}/SKILL.md"
+        if skill_path.is_file():
+            ok(f".claude/skills/{skill}/SKILL.md exists")
+        else:
+            fail(f".claude/skills/{skill}/SKILL.md exists")
+
+    bootstrap_content = (repo / ".claude/commands/bootstrap.md").read_text()
+    for skill in ["github-commit", "github-branch-publish"]:
+        clone_line = f"cp -r /tmp/claude-skills-bootstrap/{skill} .claude/skills/{skill}"
+        if clone_line not in bootstrap_content:
+            ok(f"bootstrap.md no longer clones {skill} from claude-skills")
+        else:
+            fail(f"bootstrap.md no longer clones {skill} from claude-skills")
+
+    if "cp -r /tmp/claude-skills-bootstrap/action-board" in bootstrap_content:
+        ok("bootstrap.md still clones action-board from claude-skills")
+    else:
+        fail("bootstrap.md still clones action-board from claude-skills")
+
+    upgrade_content = (repo / ".claude/commands/upgrade.md").read_text()
+    if ".claude/skills/" in upgrade_content:
+        ok(".claude/skills/ listed in /upgrade's file list")
+    else:
+        fail(".claude/skills/ listed in /upgrade's file list")
+
+
 # ─── SOW branch naming ────────────────────────────────────────────────────────
 
 def test_sow_branch_naming():
@@ -559,6 +592,7 @@ def main():
     test_upgrade_backfills_task_board_folder_id()
     test_task_board_csv_parsing()
     test_upgrade_covers_all_commands()
+    test_bundled_skills()
     test_sow_branch_naming()
     test_placeholder_replacement()
     test_bootstrap_state()

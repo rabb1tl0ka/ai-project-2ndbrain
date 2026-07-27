@@ -165,6 +165,7 @@ All commands run from the repo root in a Claude Code session (`claude`).
 |---------|-------------|
 | `/github-commit` | Groups your working tree's changes by theme and proposes one commit per group. Never pushes — commit only, after you approve the full plan. |
 | `/github-branch-publish [branch] [--base <branch>]` | Same grouped-commit flow, then pushes to a branch and opens a PR — commit to PR in one shot. Defaults to your own branch per this repo's naming convention (see [Multi-contributor workflow](#multi-contributor-workflow)) if none is given. |
+| `/github-branch-refresh` | Merges the latest from your branch's parent (its SOW integration branch, or main) into your branch, then pushes. Never opens a PR. |
 
 ### Maintenance
 
@@ -249,4 +250,4 @@ To start a new SOW: copy `sows/_template/` and rename it. Or run `/bootstrap --s
 - A markdown editor — [Obsidian](https://obsidian.md) recommended (any editor works)
 - Google Drive and Slack connected in Claude Code (for `/bootstrap`)
 - Notion connected in Claude Code (optional — for `/publish-to-notion` and `/fetch-from-notion`)
-- Network access to [`github.com/rabb1tl0ka/claude-skills`](https://github.com/rabb1tl0ka/claude-skills) (optional — `/bootstrap` pulls the `action-board`, `github-commit`, and `github-branch-publish` skills from there on first run; if the clone fails, `/bootstrap` still completes, it just skips that step and those skills won't be available until someone copies them in manually)
+- Network access to [`github.com/rabb1tl0ka/claude-skills`](https://github.com/rabb1tl0ka/claude-skills) (optional — `/bootstrap` pulls the `action-board` skill from there on first run; if the clone fails, `/bootstrap` still completes, it just skips that step and `action-board` won't be available until someone copies it in manually. `github-commit`, `github-branch-publish`, and `github-branch-refresh` are bundled with this template, so they need no network access.)

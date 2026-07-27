@@ -41,7 +41,7 @@ Run /upgrade --apply to pull in the latest tooling.
 Also show a summary of commits between the two versions:
 ```bash
 git log {{current_version}}..{{latest_version}} --oneline \
-  -- .claude/commands/ templates/ sows/_template/ roadmap/CLAUDE.md roadmap/templates/ config.example.yaml README.md CLAUDE.md \
+  -- .claude/commands/ .claude/skills/ templates/ sows/_template/ roadmap/CLAUDE.md roadmap/templates/ config.example.yaml README.md CLAUDE.md \
   2>/dev/null || echo "(changelog unavailable — tags may differ)"
 ```
 Use the template repo's git history for this: fetch tags first if needed.
@@ -65,6 +65,7 @@ git checkout 2ndbrain-template/main -- <file>
 ```
 
 Files to update:
+- `.claude/skills/` (bundled skills — github-commit, github-branch-publish, github-branch-refresh)
 - `.claude/commands/2ndbrain.md`
 - `.claude/commands/onboard.md`
 - `.claude/commands/bootstrap.md`
@@ -112,7 +113,7 @@ echo "{{latest_version}}" > .kernel/.2ndbrain-version
 ### 4d — Commit
 
 ```bash
-git add .claude/commands/ config.example.yaml README.md \
+git add .claude/commands/ .claude/skills/ config.example.yaml README.md \
         sows/_template/ templates/ roadmap/CLAUDE.md roadmap/templates/ \
         .kernel/.2ndbrain-version
 # Only if 4b bis actually changed it (merged or user chose overwrite):
@@ -126,6 +127,7 @@ Report:
 
 Tooling updated:
   .claude/commands/     — all commands
+  .claude/skills/       — bundled skills
   config.example.yaml   — config reference
   sows/_template/       — SOW config and reference templates
   templates/            — meeting summary, TLU, working session templates
