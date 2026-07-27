@@ -38,7 +38,13 @@ Same files the old script copied — this is the full sync set:
 .claude/commands/meeting-recap-drive.md
 .claude/commands/publish-to-notion.md
 .claude/commands/fetch-from-notion.md
+.claude/commands/sync-tasks.md
+.claude/commands/jira-onboard.md
+.claude/commands/jira-overview.md
+.claude/commands/tlu.md
+.claude/commands/tlu-daily.md
 .claude/commands/upgrade.md
+.claude/skills/ (whole directory — bundled skills: github-commit, github-branch-publish, github-branch-refresh)
 config.example.yaml
 README.md
 CLAUDE.md
