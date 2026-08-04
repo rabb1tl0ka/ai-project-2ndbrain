@@ -116,7 +116,7 @@ After all meetings are processed, review the task board and propose updates base
 1. Read the current task board: `sows/<sow>/<sow>-tasks.md`
 2. Read the current week's done log: `sows/<sow>/done/YYYY-WW.md` (current ISO week)
 3. Scan all processed meeting summaries for:
-   - **New action items** with a clear owner → candidate for a new task
+   - **Every `## Actions` checkbox item** written in step 2 of Processing — each one is a candidate new task unless it's a near-duplicate (same task, same owner) of a row already on the live board **or already closed in the current week's done log** (read in step 2 above) — check both before proposing an ADD, otherwise already-resolved items get proposed as false-positive re-adds. This is a required pass, not a fallback — don't rely on catching these items via the narrative sections below.
    - **Resolved items** — tasks confirmed done by anyone in the meeting → candidate to close
    - **Status changes** — a blocker that got unblocked, or a new blocker introduced → candidate to update
    - **New blockers** from NEEDS FURTHER DISCUSSION or unowned action items → candidate to add as `blocked`
