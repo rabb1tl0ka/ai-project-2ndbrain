@@ -208,7 +208,7 @@ All commands run from the repo root in a Claude Code session (`claude`).
 |---------|-------------|
 | `/github-commit` | Groups your working tree's changes by theme and proposes one commit per group. Never pushes — commit only, after you approve the full plan. |
 | `/github-branch-publish [branch] [--base <branch>]` | Same grouped-commit flow, then pushes to a branch and opens a PR — commit to PR in one shot. Defaults to your own branch per this repo's naming convention (see [Multi-contributor workflow](#multi-contributor-workflow)) if none is given. |
-| `/github-branch-refresh` | Merges the latest from your branch's parent (its SOW integration branch, or main) into your branch, then pushes. Never opens a PR. |
+| `/github-branch-refresh [main]` | Pulls the latest from your branch's parent (your SOW branch, or `main` if passed) into whatever you're on, then pushes — always to your own branch, never a PR. Run this periodically so your branch doesn't drift behind other contributors' merged work. |
 
 ### Maintenance
 
