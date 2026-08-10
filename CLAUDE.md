@@ -244,6 +244,22 @@ To manually log a meeting (e.g. from a paste or a file you already have open):
 
 ---
 
+## Sprint Call Prep — Surfacing Decided vs. Open Strategic Questions
+
+When preparing talking points for a sprint start/review call (or any prep doc ahead of a client/team call), don't just list tasks — actively audit for strategic questions that are foundational to the next stretch of work and could cause churn if left ambiguous (operating model, access model, core mechanics, output format, scope boundaries). This applies on top of whatever specific prep the user asked for, not instead of it.
+
+For each candidate question, sort it into exactly one bucket — and require the evidence before writing the label:
+
+- **Decided**: there's an explicit, dated moment where the team converged, quotable from a meeting summary. Restate this plainly in the prep doc so it doesn't get re-litigated — but never assume something is decided just because it's the current default or nobody objected.
+- **Assumed/emergent**: it shows up as a de facto choice in an artifact (a demo, a prototype, a draft) but nobody actually decided it as a team. This is easy to mistake for "decided" because it's already reflected in the work — it isn't. Flag it as open.
+- **Raised but dropped**: someone explicitly asked the question in a meeting and it was never answered. Grep for it — these are usually sitting in plain sight in a meeting summary, one line, never followed up.
+
+Rank the open items: which ones gate the *next* work (build scope, spec decisions, pairing/assignment) go in as "force this sprint"; the rest go in as "surface for awareness, not a blocker."
+
+Do this by actually grepping/reading meeting-summaries and sow-context — not from memory of what "seems like" it was probably decided. If the user names a specific claim (e.g. "we landed on X"), verify it against the notes and report what the evidence actually shows before building on top of it, per the global "Report what the evidence shows" instruction.
+
+---
+
 ## Inbox Processing
 
 When the user says "process my inbox":
