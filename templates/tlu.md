@@ -32,7 +32,7 @@ Items actively stopping progress right now — not just at-risk, actually stuck.
 
 Items that could become blockers but haven't yet, or open uncertainty that could derail scope/timeline. One subsection per risk. Only call something a risk if there's a real "if X happens, then Y" — if it's already actively stopping work, it's a Blocker, not a Risk.
 
-### ⚠️ Risk #1: [Short title] (Probability, Impact)
+### ⚠️ Risk #1: [Short title] (Probability: Low/Medium/High, Impact: Low/Medium/High)
 
 What the risk actually is, what's driving it, and what's been done about it so far. Distinguish confirmed facts from the team's own read/inference — flag inference explicitly rather than presenting it as settled.
 
