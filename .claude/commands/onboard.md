@@ -93,8 +93,9 @@ For each SOW in the list (in order):
 ```bash
 cp -r sows/_template sows/<sow>
 mv sows/<sow>/sow-reference.md sows/<sow>/<sow>-reference.md
-mv sows/<sow>/sow-tasks.md sows/<sow>/<sow>-tasks.md
 ```
+
+`tasks/` needs no rename — it's already SOW-scoped by directory, not filename.
 
 If `sows/<sow>` already exists, skip the copy and note it.
 

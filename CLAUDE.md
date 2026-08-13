@@ -209,7 +209,7 @@ For SOWs that need Jira-derived status in their TLUs:
 
 ## Task Board Spreadsheet Sync
 
-Teammates and stakeholders without repo access can get a read-only view of a SOW's task board via a Google Spreadsheet. The markdown file (`sows/<sow>/<sow>-tasks.md`) is always the source of truth — the spreadsheet is a derived, one-way export.
+Teammates and stakeholders without repo access can get a read-only view of a SOW's task board via a Google Spreadsheet. The task files (`sows/<sow>/tasks/*.md`) are always the source of truth — the spreadsheet is a derived, one-way export.
 
 Run `/sync-tasks` (optionally with a SOW name) to publish the current task board to Drive. Because the Google Drive MCP can't overwrite a file's content in place, **every sync creates a brand-new spreadsheet titled with today's date** rather than updating one persistent sheet. Treat this as a feature, not a workaround: each sync is a dated snapshot of task status at that moment, and older snapshots are left in Drive intentionally as history. The latest snapshot's ID and URL are written to `TASK_BOARD_SHEET_ID` / `TASK_BOARD_SHEET_URL` in `sows/<sow>/sow.config.yaml` — re-share the new link with stakeholders after each sync.
 

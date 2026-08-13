@@ -40,7 +40,7 @@ Anything else worth flagging — first-run caveats (no prior snapshot to diff ag
 
 ## Full open task board
 
-Everything currently open on `<sow>-tasks.md`, not just what changed today — so the whole radar is visible in one place, not only the delta. Blocked and high-priority items first. Full context (Notes column) lives in the task board file itself; link it rather than repeating it here.
+Everything currently open under `sows/<sow>/tasks/`, not just what changed today — so the whole radar is visible in one place, not only the delta. Blocked and high-priority items first. Full context (Notes section) lives in each task's own file; link it rather than repeating it here.
 
 | ID | Task | Owner | Priority | Status |
 |----|------|-------|----------|--------|

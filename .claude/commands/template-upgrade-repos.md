@@ -39,6 +39,7 @@ Same files the old script copied — this is the full sync set:
 .claude/commands/publish-to-notion.md
 .claude/commands/fetch-from-notion.md
 .claude/commands/sync-tasks.md
+.claude/commands/migrate-tasks-to-files.md
 .claude/commands/jira-onboard.md
 .claude/commands/jira-overview.md
 .claude/commands/tlu.md
@@ -50,6 +51,8 @@ README.md
 CLAUDE.md
 sows/_template/sow.config.yaml
 sows/_template/sow-reference.md
+sows/_template/tasks/.gitkeep
+sows/_template/tasks/done/.gitkeep
 templates/ (whole directory)
 .gitignore
 ```

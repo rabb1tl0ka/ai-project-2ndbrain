@@ -74,6 +74,7 @@ Files to update:
 - `.claude/commands/publish-to-notion.md`
 - `.claude/commands/fetch-from-notion.md`
 - `.claude/commands/sync-tasks.md`
+- `.claude/commands/migrate-tasks-to-files.md`
 - `.claude/commands/jira-onboard.md`
 - `.claude/commands/jira-overview.md`
 - `.claude/commands/tlu.md`

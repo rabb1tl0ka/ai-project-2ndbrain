@@ -53,7 +53,8 @@ def test_repo_structure():
         "sows/_template/meeting-summaries",
         "sows/_template/deliverables",
         "sows/_template/work",
-        "sows/_template/done",
+        "sows/_template/tasks",
+        "sows/_template/tasks/done",
         ".claude/commands",
         ".kernel",
     ]
@@ -73,12 +74,14 @@ def test_repo_structure():
         "templates/working-session.md",
         "sows/_template/sow.config.yaml",
         "sows/_template/sow-reference.md",
-        "sows/_template/sow-tasks.md",
+        "sows/_template/tasks/.gitkeep",
+        "sows/_template/tasks/done/.gitkeep",
         "sows/_template/CLAUDE.md",
         ".claude/commands/onboard.md",
         ".claude/commands/bootstrap.md",
         ".claude/commands/2ndbrain.md",
         ".claude/commands/meeting-recap.md",
+        ".claude/commands/migrate-tasks-to-files.md",
         ".kernel/roadmap/README.md",
     ]
     for f in files:
@@ -131,22 +134,21 @@ def test_sow_task_board():
     else:
         fail("sows/_template/CLAUDE.md exists")
 
-    if (repo / "sows/_template/sow-tasks.md").is_file():
-        ok("sows/_template/sow-tasks.md exists")
+    if not (repo / "sows/_template/sow-tasks.md").exists():
+        ok("sows/_template/sow-tasks.md removed from scaffold")
     else:
-        fail("sows/_template/sow-tasks.md exists")
+        fail("sows/_template/sow-tasks.md removed from scaffold")
 
-    if (repo / "sows/_template/done/.gitkeep").is_file():
-        ok("sows/_template/done/.gitkeep exists")
+    if not (repo / "sows/_template/done").exists():
+        ok("sows/_template/done/ (weekly log dir) removed from scaffold")
     else:
-        fail("sows/_template/done/.gitkeep exists")
+        fail("sows/_template/done/ (weekly log dir) removed from scaffold")
 
-    tasks_content = (repo / "sows/_template/sow-tasks.md").read_text()
-    for col in ["ID", "Task", "Owner", "Priority", "Due", "Session", "Status", "Notes"]:
-        if col in tasks_content:
-            ok(f"sow-tasks.md has '{col}' column")
+    for f in ["sows/_template/tasks/.gitkeep", "sows/_template/tasks/done/.gitkeep"]:
+        if (repo / f).is_file():
+            ok(f"{f} exists")
         else:
-            fail(f"sow-tasks.md has '{col}' column")
+            fail(f"{f} exists")
 
     claude_content = (repo / "sows/_template/CLAUDE.md").read_text()
     if "{{SOW_NAME}}" in claude_content:
@@ -159,11 +161,22 @@ def test_sow_task_board():
     else:
         fail("sows/_template/CLAUDE.md references priority inference")
 
-    onboard = (repo / ".claude/commands/onboard.md").read_text()
-    if "sow-tasks.md" in onboard and "<sow>-tasks.md" in onboard:
-        ok("/onboard renames sow-tasks.md → <sow>-tasks.md")
+    for field in ["id", "owner", "priority", "due", "session", "status"]:
+        if field in claude_content:
+            ok(f"sows/_template/CLAUDE.md task schema documents '{field}'")
+        else:
+            fail(f"sows/_template/CLAUDE.md task schema documents '{field}'")
+
+    if "tasks/<task-id>.md" in claude_content and "tasks/done" in claude_content:
+        ok("sows/_template/CLAUDE.md documents per-task files under tasks/ and tasks/done/")
     else:
-        fail("/onboard renames sow-tasks.md → <sow>-tasks.md")
+        fail("sows/_template/CLAUDE.md documents per-task files under tasks/ and tasks/done/")
+
+    onboard = (repo / ".claude/commands/onboard.md").read_text()
+    if "sow-tasks.md" not in onboard:
+        ok("/onboard no longer renames sow-tasks.md")
+    else:
+        fail("/onboard no longer renames sow-tasks.md")
 
     if "{{SOW_NAME}}" in onboard and "sed" in onboard:
         ok("/onboard replaces {{SOW_NAME}} placeholder")
@@ -175,6 +188,63 @@ def test_sow_task_board():
         ok("root CLAUDE.md references per-SOW CLAUDE.md")
     else:
         fail("root CLAUDE.md references per-SOW CLAUDE.md")
+
+    if "sows/<sow>/tasks/*.md" in root_claude or "tasks/*.md" in root_claude:
+        ok("root CLAUDE.md's task board sync section points at tasks/*.md, not a table file")
+    else:
+        fail("root CLAUDE.md's task board sync section points at tasks/*.md, not a table file")
+
+
+def test_migrate_tasks_command():
+    section("/migrate-tasks-to-files")
+    repo = Path(__file__).parent.parent
+
+    skill_path = repo / ".claude/commands/migrate-tasks-to-files.md"
+    if skill_path.is_file():
+        ok(".claude/commands/migrate-tasks-to-files.md exists")
+    else:
+        fail(".claude/commands/migrate-tasks-to-files.md exists")
+        return
+
+    content = skill_path.read_text()
+    for phrase in ["<sow>-tasks.md", "tasks/<id>.md", "tasks/done", "manual", "never automatic"]:
+        if phrase in content:
+            ok(f"migrate-tasks-to-files.md mentions '{phrase}'")
+        else:
+            fail(f"migrate-tasks-to-files.md mentions '{phrase}'")
+
+
+def _migrate_table_row_to_frontmatter(header_cells, row_cells):
+    """Mirrors the column-name mapping described in migrate-tasks-to-files.md step 3."""
+    header_map = {h.strip().lower(): i for i, h in enumerate(header_cells)}
+    expected = ["id", "task", "owner", "priority", "due", "session", "status", "notes"]
+    result = {}
+    for i, field in enumerate(expected):
+        idx = header_map.get(field, i if i < len(row_cells) else None)
+        result[field] = row_cells[idx].strip() if idx is not None and idx < len(row_cells) else ""
+    # unescape literal pipes that were escaped for table syntax
+    result["notes"] = result["notes"].replace("\\|", "|")
+    return result
+
+
+def test_migrate_tasks_parsing():
+    section("Migration table -> frontmatter parsing")
+
+    header = ["ID", "Task", "Owner", "Priority", "Due", "Session", "Status", "Notes"]
+
+    row = ["kickoff-01", "Send agenda", "bruno", "high", "", "kickoff", "open", ""]
+    parsed = _migrate_table_row_to_frontmatter(header, row)
+    if parsed["id"] == "kickoff-01" and parsed["due"] == "":
+        ok("Row with empty Due parses with empty due field")
+    else:
+        fail("Row with empty Due parses with empty due field", repr(parsed))
+
+    row2 = ["t-01", "Fix bug", "bruno", "high", "", "tech", "open", "blocked\\|waiting on client"]
+    parsed2 = _migrate_table_row_to_frontmatter(header, row2)
+    if parsed2["notes"] == "blocked|waiting on client":
+        ok("Escaped pipe in Notes is unescaped back to a literal '|'")
+    else:
+        fail("Escaped pipe in Notes is unescaped", repr(parsed2))
 
 
 def test_sow_config_template():
@@ -261,7 +331,7 @@ def test_sync_tasks_config_and_skill():
         return
 
     skill_content = skill_path.read_text()
-    for phrase in ["create_file", "TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "new spreadsheet", "TASK_BOARD_FOLDER_ID"]:
+    for phrase in ["create_file", "TASK_BOARD_SHEET_ID", "TASK_BOARD_SHEET_URL", "new spreadsheet", "TASK_BOARD_FOLDER_ID", "tasks/*.md"]:
         if phrase in skill_content:
             ok(f"sync-tasks.md mentions '{phrase}'")
         else:
@@ -271,6 +341,11 @@ def test_sync_tasks_config_and_skill():
         ok("sync-tasks.md no longer derives parentId from DRIVE_FOLDERS")
     else:
         fail("sync-tasks.md no longer derives parentId from DRIVE_FOLDERS")
+
+    if "<sow>-tasks.md" not in skill_content:
+        ok("sync-tasks.md no longer reads a shared table file")
+    else:
+        fail("sync-tasks.md no longer reads a shared table file")
 
 
 # ─── /sync-tasks folder backfill (upgrade.sh) ─────────────────────────────────
@@ -343,80 +418,121 @@ def test_upgrade_backfills_task_board_folder_id():
             fail("_template skipped by backfill loop", repr(template_content))
 
 
-def _markdown_table_to_csv(markdown):
+def _parse_frontmatter(text):
+    """Minimal YAML-frontmatter parser, mirrors what sync-tasks.md expects Claude to do."""
+    lines = text.strip().splitlines()
+    assert lines[0].strip() == "---"
+    fm = {}
+    for line in lines[1:]:
+        if line.strip() == "---":
+            break
+        if ":" not in line:
+            continue
+        key, _, value = line.partition(":")
+        fm[key.strip()] = value.strip().strip('"').strip("'")
+    return fm
+
+
+def _notes_body(text):
+    if "## Notes" not in text:
+        return ""
+    body = text.split("## Notes", 1)[1]
+    return " ".join(line.strip() for line in body.strip().splitlines() if line.strip())
+
+
+def _csv_escape(cell):
+    if any(ch in cell for ch in [",", '"', "\n"]):
+        return '"' + cell.replace('"', '""') + '"'
+    return cell
+
+
+def _task_files_to_csv(files):
     """Mirrors the parsing algorithm described in .claude/commands/sync-tasks.md."""
-    def split_row(line):
-        cells = [c.strip() for c in line.strip().split("|")]
-        # drop empty leading/trailing cells produced by the outer pipes
-        if cells and cells[0] == "":
-            cells = cells[1:]
-        if cells and cells[-1] == "":
-            cells = cells[:-1]
-        return cells
-
-    def is_separator(cells):
-        return all(set(c) <= {"-"} for c in cells if c != "")
-
-    def csv_escape(cell):
-        if any(ch in cell for ch in [",", '"', "\n"]):
-            return '"' + cell.replace('"', '""') + '"'
-        return cell
-
+    header = ["ID", "Task", "Owner", "Priority", "Due", "Session", "Status", "Notes"]
+    fields = ["id", "task", "owner", "priority", "due", "session", "status"]
     rows = []
-    for line in markdown.strip().splitlines():
-        line = line.strip()
-        if not line.startswith("|"):
-            continue
-        cells = split_row(line)
-        if is_separator(cells):
-            continue
-        rows.append(cells)
-
-    return "\n".join(",".join(csv_escape(c) for c in row) for row in rows)
+    for f in sorted(files, key=lambda t: _parse_frontmatter(t)["id"]):
+        fm = _parse_frontmatter(f)
+        row = [fm.get(field, "") for field in fields] + [_notes_body(f)]
+        rows.append(row)
+    lines = [",".join(header)]
+    lines += [",".join(_csv_escape(c) for c in row) for row in rows]
+    return "\n".join(lines)
 
 
 def test_task_board_csv_parsing():
-    section("Task board markdown -> CSV parsing")
+    section("Task files -> CSV parsing")
 
-    header_only = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
-|----|------|-------|----------|-----|---------|--------|-------|
-"""
-    csv = _markdown_table_to_csv(header_only)
+    csv = _task_files_to_csv([])
     if csv == "ID,Task,Owner,Priority,Due,Session,Status,Notes":
-        ok("Empty task board produces header-only CSV")
+        ok("No task files produces header-only CSV")
     else:
-        fail("Empty task board produces header-only CSV", repr(csv))
+        fail("No task files produces header-only CSV", repr(csv))
 
-    normal_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
-|----|------|-------|----------|-----|---------|--------|-------|
-| kickoff-01 | Send agenda | bruno | high | 2026-07-10 | kickoff | open | |
+    normal = """---
+id: kickoff-01
+task: "Send agenda"
+owner: bruno
+priority: high
+due: 2026-07-10
+session: kickoff
+status: open
+---
 """
-    csv = _markdown_table_to_csv(normal_row)
+    csv = _task_files_to_csv([normal])
     lines = csv.splitlines()
     if len(lines) == 2 and lines[1].split(",")[:3] == ["kickoff-01", "Send agenda", "bruno"]:
-        ok("Normal data row parses into the right fields")
+        ok("Normal task file parses into the right fields")
     else:
-        fail("Normal data row parses into the right fields", repr(lines))
+        fail("Normal task file parses into the right fields", repr(lines))
 
-    comma_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
-|----|------|-------|----------|-----|---------|--------|-------|
-| t-01 | Fix bug | bruno | high | | tech | open | blocked, waiting on client |
+    comma_notes = """---
+id: t-01
+task: "Fix bug"
+owner: bruno
+priority: high
+due:
+session: tech
+status: open
+---
+
+## Notes
+
+blocked, waiting on client
 """
-    csv = _markdown_table_to_csv(comma_row)
+    csv = _task_files_to_csv([comma_notes])
     if '"blocked, waiting on client"' in csv:
-        ok("Cell with a comma is quoted")
+        ok("Notes containing a comma is quoted")
     else:
-        fail("Cell with a comma is quoted", repr(csv))
+        fail("Notes containing a comma is quoted", repr(csv))
 
-    quote_row = """| ID | Task | Owner | Priority | Due | Session | Status | Notes |
-|----|------|-------|----------|-----|---------|--------|-------|
-| t-02 | Say "hi" | bruno | low | | tech | open | |
+    quote_notes = """---
+id: t-02
+task: 'Say hi'
+owner: bruno
+priority: low
+due:
+session: tech
+status: open
+---
+
+## Notes
+
+Client said "hi" in the call
 """
-    csv = _markdown_table_to_csv(quote_row)
-    if '"Say ""hi"""' in csv:
-        ok("Cell with a double quote is escaped and wrapped")
+    csv = _task_files_to_csv([quote_notes])
+    if '"Client said ""hi"" in the call"' in csv:
+        ok("Notes containing a double quote is escaped and wrapped")
     else:
-        fail("Cell with a double quote is escaped and wrapped", repr(csv))
+        fail("Notes containing a double quote is escaped and wrapped", repr(csv))
+
+    multi = [normal, comma_notes]
+    csv = _task_files_to_csv(multi)
+    ids = [line.split(",")[0] for line in csv.splitlines()[1:]]
+    if ids == ["kickoff-01", "t-01"]:
+        ok("Rows sorted by id for a stable export order")
+    else:
+        fail("Rows sorted by id for a stable export order", repr(ids))
 
 
 # ─── /upgrade file coverage ───────────────────────────────────────────────────
@@ -592,6 +708,8 @@ def main():
     test_gitignore()
     test_config_example()
     test_sow_task_board()
+    test_migrate_tasks_command()
+    test_migrate_tasks_parsing()
     test_sow_config_template()
     test_sow_config_parsing()
     test_sync_tasks_config_and_skill()

@@ -113,10 +113,10 @@ If no such attachment exists yet, the notes likely aren't ready (Gemini can take
 
 After all meetings are processed, review the task board and propose updates based on what surfaced across the meeting summaries.
 
-1. Read the current task board: `sows/<sow>/<sow>-tasks.md`
-2. Read the current week's done log: `sows/<sow>/done/YYYY-WW.md` (current ISO week)
+1. Read the current open task files: `sows/<sow>/tasks/*.md`
+2. Read this week's closed task files: `sows/<sow>/tasks/done/*.md`, filtered to `closed:` dates in the current ISO week
 3. Scan all processed meeting summaries for:
-   - **Every `## Actions` checkbox item** written in step 2 of Processing — each one is a candidate new task unless it's a near-duplicate (same task, same owner) of a row already on the live board **or already closed in the current week's done log** (read in step 2 above) — check both before proposing an ADD, otherwise already-resolved items get proposed as false-positive re-adds. This is a required pass, not a fallback — don't rely on catching these items via the narrative sections below.
+   - **Every `## Actions` checkbox item** written in step 2 of Processing — each one is a candidate new task unless it's a near-duplicate (same task, same owner) of an existing open task file **or already closed this week** (read in steps 1–2 above) — check both before proposing an ADD, otherwise already-resolved items get proposed as false-positive re-adds. This is a required pass, not a fallback — don't rely on catching these items via the narrative sections below.
    - **Resolved items** — tasks confirmed done by anyone in the meeting → candidate to close
    - **Status changes** — a blocker that got unblocked, or a new blocker introduced → candidate to update
    - **New blockers** from NEEDS FURTHER DISCUSSION or unowned action items → candidate to add as `blocked`
@@ -141,17 +141,26 @@ After all meetings are processed, review the task board and propose updates base
 5. Ask: "Apply these changes, adjust, or skip?"
 
 6. On confirmation, apply the changes:
-   - New tasks: append rows to the task board following the task schema
-   - Closed tasks: move to the done log (`sows/<sow>/done/YYYY-WW.md`) with today's date, remove from task board
-   - Updated tasks: edit the relevant row in place
+   - New tasks: create `sows/<sow>/tasks/<task-id>.md` following the task schema, with the meeting/session context as the file body
+   - Closed tasks: add `closed: YYYY-MM-DD` (today) to the file's frontmatter and move it to `sows/<sow>/tasks/done/<task-id>.md`
+   - Updated tasks: edit the relevant file's frontmatter or `## Notes` section in place
 
-### Task schema (for reference when adding rows)
+### Task schema (for reference when creating task files)
 
-| ID | Task | Owner | Priority | Due | Session | Status | Notes |
-|----|------|-------|----------|-----|---------|--------|-------|
+```yaml
+---
+id: kickoff-01
+task: "Confirm data access with client IT"
+owner: rommel
+priority: high
+due: 2026-08-20
+session: kickoff
+status: open
+---
+```
 
-- `ID`: short slug (`kickoff-01`, `arch-review-02`)
-- `Priority`: `high` / `medium` / `low` — infer from context if not explicit
-- `Due`: date if stated, otherwise empty
-- `Session`: slug of the working session this came from, or the meeting slug if no working session applies
-- `Status`: `open` or `blocked`
+- `id`: short slug (`kickoff-01`, `arch-review-02`)
+- `priority`: `high` / `medium` / `low` — infer from context if not explicit
+- `due`: date if stated, otherwise empty
+- `session`: slug of the working session this came from, or the meeting slug if no working session applies
+- `status`: `open` or `blocked`

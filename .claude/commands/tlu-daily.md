@@ -46,9 +46,9 @@ git status --porcelain -- sows/<sow>
 
 The `diff` covers committed changes since the anchor; `status --porcelain` catches anything new/uncommitted (nothing needs to be committed for it to show up in the delta — this is a live working-tree comparison, not a commit-to-commit one). Read both together. From this, work out:
 
-- **Tasks added** — new rows in `sows/<sow>/<sow>-tasks.md`
-- **Tasks closed** — rows that left the task board and appear in `sows/<sow>/done/YYYY-WW.md` with a closed date in the window
-- **Tasks meaningfully updated** — existing rows whose `Status`, `Priority`, or `Notes` changed (ignore trivial reformatting)
+- **Tasks added** — new files under `sows/<sow>/tasks/`
+- **Tasks closed** — files that moved to `sows/<sow>/tasks/done/` with a `closed:` date in the window
+- **Tasks meaningfully updated** — existing task files whose `status`, `priority`, or `## Notes` changed (ignore trivial reformatting)
 - **New meeting summaries / working-session activity** — new or changed files under `sows/<sow>/meeting-summaries/` or `sows/<sow>/work/`
 
 Don't invent movement that isn't in the diff — if nothing changed on a given axis, say so plainly rather than padding the report.
@@ -72,10 +72,10 @@ State the reasoning behind the marker in the Notes section — don't leave it as
 
 ## 6a — Build the full open task board snapshot
 
-Read `sows/<sow>/<sow>-tasks.md` in full and build a compact table (ID, Task, Owner, Priority, Status only — leave out Notes, it's too long for this view) covering **every currently open row**, not just what changed today. This is the "whole radar" view so anyone reading the daily report sees everything in flight, not only the delta.
+Read every file under `sows/<sow>/tasks/*.md` (excluding `tasks/done/`) and build a compact table (ID, Task, Owner, Priority, Status only — leave out Notes, it's too long for this view) covering **every currently open task**, not just what changed today. This is the "whole radar" view so anyone reading the daily report sees everything in flight, not only the delta.
 
 - Sort: `blocked` status first, then by priority (`high` → `medium` → `low`), then by ID.
-- Point to `sows/<sow>/<sow>-tasks.md` for full context/Notes on any item — don't duplicate the Notes column here.
+- Point to the individual task file under `sows/<sow>/tasks/` for full context/Notes on any item — don't duplicate the Notes section here.
 - This section is unconditional — include it even on a first-ever run with no delta to report (see step 3).
 
 ## 7 — Fill the template and save

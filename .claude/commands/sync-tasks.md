@@ -52,16 +52,16 @@ Extract the folder ID from the pasted URL (last path segment after `/folders/`) 
 
 ### 1 — Read and parse the task board
 
-Read `sows/<sow>/<sow>-tasks.md`. Find the markdown table (header row, separator row of dashes, then data rows).
+Glob `sows/<sow>/tasks/*.md` (open tasks only — `tasks/done/` is excluded, this export is open-items-only same as before). For each file, read the frontmatter block and extract `id`, `task`, `owner`, `priority`, `due`, `session`, `status`. Read the body's `## Notes` section (if present) and use its content, trimmed and flattened to one line, as the `Notes` cell.
 
 Convert to CSV:
-- Header row → CSV header, in the same column order (`ID,Task,Owner,Priority,Due,Session,Status,Notes`)
-- Skip the `|---|---|...` separator row
-- For each data row: split on `|`, drop the empty leading/trailing cells from the outer pipes, trim whitespace from each cell
+- Header row: `ID,Task,Owner,Priority,Due,Session,Status,Notes` — same column order as the old table export
+- One data row per task file, in the same field order
+- Sort rows by the frontmatter `id` for a stable, deterministic order across syncs
 - CSV-escape each cell: if it contains a comma, double-quote, or newline, wrap it in double quotes and double any embedded double quotes
 - Join cells with commas, rows with newlines
 
-If the table has no data rows (empty task board), still produce a CSV with just the header row.
+If `tasks/*.md` has no files (empty task board), still produce a CSV with just the header row.
 
 ### 2 — Create the new snapshot spreadsheet
 
